@@ -5,25 +5,38 @@ from django.contrib.auth.hashers import make_password
 def AutoAddUser(sender, **kwargs):
     from .models import UsuariosModels
     from RolApp.models import RolModels
+    
+    if not RolModels.objects.filter(NombreRol='RolAdmin'):
+        RolModels.objects.create(
+            NombreRol='RolAdmin',
+            DescripcionRol='Rol unico de administrador',
+            PermisoVerDashboard=True,
+            PermisoEditarStock=True,
+            PermisoCrearContratos=True
+        )
+
+    print("Rol unico de administrador creado")
         
     if not UsuariosModels.objects.filter(Username="Admin"):
 
         Rol_id = RolModels.objects.filter(NombreRol="RolAdmin").first()
-    
-        UsuariosModels.objects.create(
-            Username='Admin',
-            Password=make_password('Admin123'),
-            Email='POR DEFINIR',
-            Nombre='POR DEFINIR',
-            Apellido='POR DEFINIR',
-            Rut='00000000-0',
-            Telefono='000000000',
-            EstadoUsuario=True,
-            Rol=Rol_id,
-        )
+        
+        if Rol_id:
+            UsuariosModels.objects.create(
+                Username='Admin',
+                Password=make_password('Admin123'),
+                Email='POR DEFINIR',
+                Nombre='POR DEFINIR',
+                Apellido='POR DEFINIR',
+                Rut='00000000-0',
+                Telefono='000000000',
+                EstadoUsuario=True,
+                Rol=Rol_id,
+            )
 
-        print("Usuario administrador creado")
-
+            print("Usuario administrador creado")
+        else:
+            print("No se pudo crear el Admin: El RolAdmin no fue encontrado.")
 
 class UsuariosappConfig(AppConfig):
     default_auto_field = 'django.db.models.BigAutoField'

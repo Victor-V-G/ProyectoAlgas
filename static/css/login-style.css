@@ -1,0 +1,248 @@
+/* CSS del Login - Conversión de Tailwind a CSS puro */
+
+/* Contenedor principal */
+.login-container {
+  min-height: 100vh;
+  background: linear-gradient(135deg, #1e3a8a 0%, #115e59 50%, #047857 100%);
+  display: flex;
+  flex-direction: column; /* ← ESTA ES LA CLAVE */
+  justify-content: flex-start; /* ← sube los elementos */
+  align-items: center;
+  padding: 1rem;
+}
+
+/* Tarjeta de login */
+.login-card {
+  background-color: white;
+  border-radius: 0.5rem;
+  box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.25);
+  width: 100%;
+  max-width: 28rem;
+  padding: 2rem;
+  animation: fadeIn 0.3s ease-in-out;
+}
+
+/* Header del login */
+.login-header {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin-bottom: 2rem;
+}
+
+.login-icon {
+  width: 3rem;
+  height: 3rem;
+  color: #0d9488;
+  margin-right: 0.75rem;
+}
+
+.login-title {
+  font-size: 1.5rem;
+  line-height: 2rem;
+  font-weight: 700;
+  color: #134e4a;
+  margin: 0;
+}
+
+.login-subtitle {
+  color: #4b5563;
+  font-size: 0.875rem;
+  line-height: 1.25rem;
+  margin: 0;
+}
+
+/* Formulario */
+.login-form {
+  display: flex;
+  flex-direction: column;
+  gap: 1.5rem;
+}
+
+.form-group {
+  display: flex;
+  flex-direction: column;
+}
+
+.form-label {
+  display: block;
+  color: #374151;
+  margin-bottom: 0.5rem;
+  font-weight: 500;
+}
+
+.form-input,
+.form-select {
+  width: 100%;
+  padding: 0.75rem 1rem;
+  border: 1px solid #d1d5db;
+  border-radius: 0.5rem;
+  font-size: 1rem;
+  transition: all 0.15s ease-in-out;
+  outline: none;
+}
+
+.form-input:focus,
+.form-select:focus {
+  border-color: transparent;
+  box-shadow: 0 0 0 2px #14b8a6;
+}
+
+.form-select {
+  appearance: none;
+  background-image: url("data:image/svg+xml,%3csvg xmlns='http://www.w3.org/2000/svg' fill='none' viewBox='0 0 20 20'%3e%3cpath stroke='%236b7280' stroke-linecap='round' stroke-linejoin='round' stroke-width='1.5' d='M6 8l4 4 4-4'/%3e%3c/svg%3e");
+  background-position: right 0.5rem center;
+  background-repeat: no-repeat;
+  background-size: 1.5em 1.5em;
+  padding-right: 2.5rem;
+}
+
+/* Alert de error */
+.error-alert {
+  background-color: #fef2f2;
+  border: 1px solid #fecaca;
+  color: #991b1b;
+  padding: 0.75rem 1rem;
+  border-radius: 0.5rem;
+  font-size: 0.875rem;
+}
+
+/* Botón de submit */
+.login-button {
+  width: 100%;
+  background-color: #0d9488;
+  color: white;
+  padding: 0.75rem 1rem;
+  border-radius: 0.5rem;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.5rem;
+  border: none;
+  cursor: pointer;
+  font-weight: 500;
+  transition: background-color 0.15s ease-in-out;
+}
+
+.login-button:hover {
+  background-color: #0f766e;
+}
+
+.login-button:active {
+  transform: scale(0.98);
+}
+
+.login-button-icon {
+  width: 1.25rem;
+  height: 1.25rem;
+}
+
+/* Info box de credenciales */
+.credentials-info {
+  margin-top: 1.5rem;
+  padding: 1rem;
+  background-color: #eff6ff;
+  border-radius: 0.5rem;
+  border: 1px solid #bfdbfe;
+}
+
+.credentials-info-title {
+  font-size: 0.875rem;
+  line-height: 1.25rem;
+  color: #1e3a8a;
+  margin-bottom: 0.5rem;
+  font-weight: 500;
+}
+
+.credentials-list {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+}
+
+.credentials-list li {
+  font-size: 0.75rem;
+  line-height: 1rem;
+  color: #1e40af;
+  margin-bottom: 0.25rem;
+}
+
+/* Responsive */
+@media (max-width: 640px) {
+  .login-card {
+    padding: 1.5rem;
+  }
+
+  .login-title {
+    font-size: 1.25rem;
+  }
+
+  .login-icon {
+    width: 2.5rem;
+    height: 2.5rem;
+  }
+}
+
+/* Animaciones */
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+    transform: translateY(-10px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+/* Estados de carga */
+.login-button:disabled {
+  background-color: #99f6e4;
+  cursor: not-allowed;
+}
+
+/* Focus visible para accesibilidad */
+.form-input:focus-visible,
+.form-select:focus-visible,
+.login-button:focus-visible {
+  outline: 2px solid #14b8a6;
+  outline-offset: 2px;
+}
+
+/* ============================
+   MENSAJES DE ALERTA (LOGIN)
+============================ */
+.login-messages {
+    width: 100%;
+    display: flex;
+    justify-content: center;
+    margin-bottom: 25px;
+    margin-top: 10px;
+}
+
+.login-message {
+    width: 100%;
+    max-width: 600px;
+    background: #F87171; /* rojo suave */
+    padding: 12px 18px;
+    border-radius: 12px;
+    color: #fff;
+    font-weight: 500;
+    font-size: 14px;
+    line-height: 1.35;
+    text-align: center;
+    box-shadow: 0 4px 12px rgba(0,0,0,0.13);
+    animation: alertFade 0.35s ease-out;
+}
+
+/* Animación suave */
+@keyframes alertFade {
+    from {
+        opacity: 0;
+        transform: translateY(-6px);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
