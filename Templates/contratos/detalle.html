@@ -1,0 +1,35 @@
+{% extends 'base.html' %}
+{% block content %}
+
+<h1>Contrato {{ contrato.id }}</h1>
+
+<p><strong>Cliente:</strong> {{ contrato.cliente }}</p>
+<p><strong>Tonelaje total:</strong> {{ contrato.tonelaje_total }} T</p>
+<p><strong>Estado:</strong> {{ contrato.estado }}</p>
+
+<hr>
+
+<h2>Entregas</h2>
+<a href="{% url 'entrega_crear' contrato.id %}">Agregar entrega</a>
+
+<table>
+    <tr>
+        <th>Mes</th>
+        <th>Requerido</th>
+        <th>Cumplido</th>
+        <th>Acciones</th>
+    </tr>
+
+    {% for e in entregas %}
+    <tr>
+        <td>{{ e.mes }}</td>
+        <td>{{ e.toneladas_requeridas }} T</td>
+        <td>{{ e.toneladas_cumplidas }} T</td>
+        <td>
+            <a href="{% url 'entrega_editar' e.id %}">Editar</a>
+        </td>
+    </tr>
+    {% endfor %}
+</table>
+
+{% endblock %}

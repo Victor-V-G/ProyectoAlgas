@@ -1,0 +1,879 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Dashboard Ejecutivo - Sistema de Gestión de Algas</title>
+    
+    <!-- Chart.js para gráficos -->
+    <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
+    
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
+            background-color: #f9fafb;
+            color: #111827;
+            line-height: 1.5;
+        }
+
+        /* Header */
+        .header {
+            background: linear-gradient(135deg, #0f766e 0%, #0d9488 100%);
+            color: white;
+            padding: 1.5rem 2rem;
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+        }
+
+        .header-content {
+            max-width: 1280px;
+            margin: 0 auto;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .header-title {
+            font-size: 1.5rem;
+            font-weight: 700;
+        }
+
+        .header-user {
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+        }
+
+        .user-info {
+            text-align: right;
+        }
+
+        .user-name {
+            font-weight: 600;
+            font-size: 0.95rem;
+        }
+
+        .user-role {
+            font-size: 0.875rem;
+            opacity: 0.9;
+        }
+
+        .logout-btn {
+            background-color: rgba(255, 255, 255, 0.2);
+            border: 1px solid rgba(255, 255, 255, 0.3);
+            color: white;
+            padding: 0.5rem 1rem;
+            border-radius: 0.375rem;
+            cursor: pointer;
+            transition: background-color 0.2s;
+            font-size: 0.875rem;
+        }
+
+        .logout-btn:hover {
+            background-color: rgba(255, 255, 255, 0.3);
+        }
+
+        /* Tabs Navigation */
+        .tabs-container {
+            background-color: white;
+            border-bottom: 1px solid #e5e7eb;
+        }
+
+        .tabs {
+            max-width: 1280px;
+            margin: 0 auto;
+            display: flex;
+            gap: 0.25rem;
+            padding: 0 1rem;
+        }
+
+        .tab {
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            padding: 1rem 1.5rem;
+            border-bottom: 2px solid transparent;
+            color: #6b7280;
+            cursor: pointer;
+            transition: all 0.2s;
+            background: none;
+            border-top: none;
+            border-left: none;
+            border-right: none;
+            font-size: 0.95rem;
+        }
+
+        .tab:hover {
+            color: #111827;
+        }
+
+        .tab.active {
+            color: #0d9488;
+            border-bottom-color: #0d9488;
+        }
+
+        .tab svg {
+            width: 1.25rem;
+            height: 1.25rem;
+        }
+
+        /* Main Content */
+        .main-content {
+            max-width: 1280px;
+            margin: 0 auto;
+            padding: 1.5rem 1rem;
+        }
+
+        .tab-content {
+            display: none;
+        }
+
+        .tab-content.active {
+            display: block;
+        }
+
+        /* KPIs Grid */
+        .kpis-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 1rem;
+            margin-bottom: 1.5rem;
+        }
+
+        .kpi-card {
+            background: white;
+            border-radius: 0.5rem;
+            padding: 1.5rem;
+            box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+        }
+
+        .kpi-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 0.5rem;
+        }
+
+        .kpi-title {
+            color: #6b7280;
+            font-size: 0.875rem;
+        }
+
+        .kpi-icon {
+            width: 1.25rem;
+            height: 1.25rem;
+        }
+
+        .kpi-icon.green { color: #10b981; }
+        .kpi-icon.blue { color: #0891b2; }
+        .kpi-icon.orange { color: #f97316; }
+
+        .kpi-footer {
+            display: flex;
+            justify-content: space-between;
+            align-items: flex-end;
+        }
+
+        .kpi-value {
+            font-size: 1.875rem;
+            font-weight: 700;
+            color: #111827;
+        }
+
+        .kpi-change {
+            font-size: 0.875rem;
+            font-weight: 600;
+        }
+
+        .kpi-change.positive { color: #10b981; }
+        .kpi-change.negative { color: #ef4444; }
+
+        /* Alert Box */
+        .alert-section {
+            background: white;
+            border-radius: 0.5rem;
+            box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+            margin-bottom: 1.5rem;
+        }
+
+        .alert-header {
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            padding: 1.5rem;
+            border-bottom: 1px solid #e5e7eb;
+        }
+
+        .alert-header svg {
+            width: 1.25rem;
+            height: 1.25rem;
+            color: #ef4444;
+        }
+
+        .alert-header h2 {
+            font-size: 1.125rem;
+            font-weight: 600;
+        }
+
+        .alerts-list {
+            padding: 1.5rem;
+        }
+
+        .alert-item {
+            display: flex;
+            gap: 0.75rem;
+            padding: 1rem;
+            border-radius: 0.5rem;
+            border-left: 4px solid;
+            margin-bottom: 0.75rem;
+        }
+
+        .alert-item:last-child {
+            margin-bottom: 0;
+        }
+
+        .alert-item.critical {
+            background-color: #fef2f2;
+            border-left-color: #ef4444;
+        }
+
+        .alert-item.warning {
+            background-color: #fefce8;
+            border-left-color: #eab308;
+        }
+
+        .alert-item.info {
+            background-color: #eff6ff;
+            border-left-color: #3b82f6;
+        }
+
+        .alert-icon {
+            width: 1.25rem;
+            height: 1.25rem;
+            flex-shrink: 0;
+            margin-top: 0.125rem;
+        }
+
+        .alert-icon.critical { color: #ef4444; }
+        .alert-icon.warning { color: #eab308; }
+        .alert-icon.info { color: #3b82f6; }
+
+        .alert-content {
+            flex: 1;
+        }
+
+        .alert-message {
+            color: #111827;
+            margin-bottom: 0.25rem;
+        }
+
+        .alert-impact {
+            font-size: 0.875rem;
+            color: #6b7280;
+        }
+
+        /* Charts Grid */
+        .charts-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(500px, 1fr));
+            gap: 1.5rem;
+            margin-bottom: 1.5rem;
+        }
+
+        @media (max-width: 1024px) {
+            .charts-grid {
+                grid-template-columns: 1fr;
+            }
+        }
+
+        .chart-card {
+            background: white;
+            border-radius: 0.5rem;
+            box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+        }
+
+        .chart-header {
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            padding: 1.5rem;
+            border-bottom: 1px solid #e5e7eb;
+        }
+
+        .chart-header svg {
+            width: 1.25rem;
+            height: 1.25rem;
+            color: #0d9488;
+        }
+
+        .chart-header h2 {
+            font-size: 1.125rem;
+            font-weight: 600;
+        }
+
+        .chart-body {
+            padding: 1.5rem;
+        }
+
+        .chart-canvas {
+            max-height: 300px;
+        }
+
+        /* Table */
+        .table-card {
+            background: white;
+            border-radius: 0.5rem;
+            box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+        }
+
+        .table-header {
+            padding: 1.5rem;
+            border-bottom: 1px solid #e5e7eb;
+        }
+
+        .table-header h2 {
+            font-size: 1.125rem;
+            font-weight: 600;
+        }
+
+        .table-container {
+            overflow-x: auto;
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+        }
+
+        thead {
+            background-color: #f9fafb;
+        }
+
+        th {
+            text-align: left;
+            padding: 0.75rem 1.5rem;
+            color: #374151;
+            font-weight: 600;
+            font-size: 0.875rem;
+        }
+
+        tbody tr {
+            border-bottom: 1px solid #e5e7eb;
+            transition: background-color 0.15s;
+        }
+
+        tbody tr:hover {
+            background-color: #f9fafb;
+        }
+
+        td {
+            padding: 1rem 1.5rem;
+            color: #111827;
+        }
+
+        .status-badge {
+            display: inline-block;
+            padding: 0.25rem 0.75rem;
+            border-radius: 9999px;
+            font-size: 0.875rem;
+            font-weight: 500;
+        }
+
+        .status-badge.normal {
+            background-color: #d1fae5;
+            color: #065f46;
+        }
+
+        .status-badge.low {
+            background-color: #fef3c7;
+            color: #92400e;
+        }
+
+        .status-badge.critical {
+            background-color: #fee2e2;
+            color: #991b1b;
+        }
+
+        /* Icons as inline SVG */
+        .icon {
+            display: inline-block;
+            width: 1.25rem;
+            height: 1.25rem;
+            vertical-align: middle;
+        }
+
+        /* Responsive */
+        @media (max-width: 768px) {
+            .kpis-grid {
+                grid-template-columns: 1fr;
+            }
+            
+            .header-content {
+                flex-direction: column;
+                gap: 1rem;
+                text-align: center;
+            }
+            
+            .user-info {
+                text-align: center;
+            }
+        }
+    </style>
+</head>
+<body>
+    <!-- Header -->
+    <header class="header">
+        <div class="header-content">
+            <h1 class="header-title">Dashboard Ejecutivo</h1>
+            <div class="header-user">
+                <div class="user-info">
+                    <div class="user-name">María González</div>
+                    <div class="user-role">Gerente Comercial</div>
+                </div>
+                <button class="logout-btn" onclick="handleLogout()">Cerrar Sesión</button>
+            </div>
+        </div>
+    </header>
+
+    <!-- Navigation Tabs -->
+    <div class="tabs-container">
+        <div class="tabs">
+            <button class="tab active" onclick="switchTab('dashboard')" data-tab="dashboard">
+                <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z" />
+                </svg>
+                Dashboard
+            </button>
+            <button class="tab" onclick="switchTab('contratos')" data-tab="contratos">
+                <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
+                </svg>
+                Contratos
+            </button>
+            <button class="tab" onclick="switchTab('compras')" data-tab="compras">
+                <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 3h2l.4 2M7 13h10l4-8H5.4M7 13L5.4 5M7 13l-2.293 2.293c-.63.63-.184 1.707.707 1.707H17m0 0a2 2 0 100 4 2 2 0 000-4zm-8 2a2 2 0 11-4 0 2 2 0 014 0z" />
+                </svg>
+                Compras
+            </button>
+        </div>
+    </div>
+
+    <!-- Main Content -->
+    <main class="main-content">
+        <!-- Dashboard Tab -->
+        <div id="dashboard-tab" class="tab-content active">
+            <!-- KPIs -->
+            <div class="kpis-grid">
+                <div class="kpi-card">
+                    <div class="kpi-header">
+                        <span class="kpi-title">Cumplimiento Contractual</span>
+                        <svg class="kpi-icon green" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
+                        </svg>
+                    </div>
+                    <div class="kpi-footer">
+                        <div class="kpi-value">94%</div>
+                        <div class="kpi-change positive">+2%</div>
+                    </div>
+                </div>
+
+                <div class="kpi-card">
+                    <div class="kpi-header">
+                        <span class="kpi-title">Producción Mensual</span>
+                        <svg class="kpi-icon blue" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 7h8m0 0v8m0-8l-8 8-4-4-6 6" />
+                        </svg>
+                    </div>
+                    <div class="kpi-footer">
+                        <div class="kpi-value">12.5 Ton</div>
+                        <div class="kpi-change positive">+8%</div>
+                    </div>
+                </div>
+
+                <div class="kpi-card">
+                    <div class="kpi-header">
+                        <span class="kpi-title">Inventario Total</span>
+                        <svg class="kpi-icon orange" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M20 7l-8-4-8 4m16 0l-8 4m8-4v10l-8 4m0-10L4 7m8 4v10M4 7v10l8 4" />
+                        </svg>
+                    </div>
+                    <div class="kpi-footer">
+                        <div class="kpi-value">11.0 Ton</div>
+                        <div class="kpi-change negative">-3%</div>
+                    </div>
+                </div>
+
+                <div class="kpi-card">
+                    <div class="kpi-header">
+                        <span class="kpi-title">Ingresos Proyectados</span>
+                        <svg class="kpi-icon green" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8c-1.657 0-3 .895-3 2s1.343 2 3 2 3 .895 3 2-1.343 2-3 2m0-8c1.11 0 2.08.402 2.599 1M12 8V7m0 1v8m0 0v1m0-1c-1.11 0-2.08-.402-2.599-1M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+                        </svg>
+                    </div>
+                    <div class="kpi-footer">
+                        <div class="kpi-value">$45M</div>
+                        <div class="kpi-change positive">+12%</div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Alertas Tempranas -->
+            <div class="alert-section">
+                <div class="alert-header">
+                    <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z" />
+                    </svg>
+                    <h2>Alertas Tempranas</h2>
+                </div>
+                <div class="alerts-list">
+                    <div class="alert-item critical">
+                        <svg class="alert-icon critical" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z" />
+                        </svg>
+                        <div class="alert-content">
+                            <p class="alert-message">Riesgo de incumplimiento contractual en Febrero 2025</p>
+                            <span class="alert-impact">Impacto: Alto</span>
+                        </div>
+                    </div>
+
+                    <div class="alert-item warning">
+                        <svg class="alert-icon warning" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z" />
+                        </svg>
+                        <div class="alert-content">
+                            <p class="alert-message">Temperatura del agua fuera de rango óptimo (últimos 3 días)</p>
+                            <span class="alert-impact">Impacto: Medio</span>
+                        </div>
+                    </div>
+
+                    <div class="alert-item warning">
+                        <svg class="alert-icon warning" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z" />
+                        </svg>
+                        <div class="alert-content">
+                            <p class="alert-message">Stock de insumos críticos bajo mínimo (7 días restantes)</p>
+                            <span class="alert-impact">Impacto: Medio</span>
+                        </div>
+                    </div>
+
+                    <div class="alert-item info">
+                        <svg class="alert-icon info" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z" />
+                        </svg>
+                        <div class="alert-content">
+                            <p class="alert-message">Proveedor notifica demora en envío (lead time +2 días)</p>
+                            <span class="alert-impact">Impacto: Bajo</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Charts Grid -->
+            <div class="charts-grid">
+                <!-- Proyección Mensual -->
+                <div class="chart-card">
+                    <div class="chart-header">
+                        <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z" />
+                        </svg>
+                        <h2>Proyección Mensual vs Contractual</h2>
+                    </div>
+                    <div class="chart-body">
+                        <canvas id="proyeccionChart" class="chart-canvas"></canvas>
+                    </div>
+                </div>
+
+                <!-- Distribución de Inventario -->
+                <div class="chart-card">
+                    <div class="chart-header">
+                        <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M20 7l-8-4-8 4m16 0l-8 4m8-4v10l-8 4m0-10L4 7m8 4v10M4 7v10l8 4" />
+                        </svg>
+                        <h2>Distribución de Inventario</h2>
+                    </div>
+                    <div class="chart-body">
+                        <canvas id="inventarioChart" class="chart-canvas"></canvas>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Inventario Actual Table -->
+            <div class="table-card">
+                <div class="table-header">
+                    <h2>Inventario Actual</h2>
+                </div>
+                <div class="table-container">
+                    <table>
+                        <thead>
+                            <tr>
+                                <th>Tipo</th>
+                                <th>Cantidad</th>
+                                <th>Unidad</th>
+                                <th>Estado</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr>
+                                <td>Alga Húmeda</td>
+                                <td>8,500</td>
+                                <td>kg</td>
+                                <td><span class="status-badge normal">Normal</span></td>
+                            </tr>
+                            <tr>
+                                <td>Alga Seca</td>
+                                <td>2,400</td>
+                                <td>kg</td>
+                                <td><span class="status-badge normal">Normal</span></td>
+                            </tr>
+                            <tr>
+                                <td>Maxisaco</td>
+                                <td>45</td>
+                                <td>unidades</td>
+                                <td><span class="status-badge normal">Normal</span></td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+
+        <!-- Contratos Tab -->
+        <div id="contratos-tab" class="tab-content">
+            <div class="table-card">
+                <div class="table-header">
+                    <h2>Gestión de Contratos</h2>
+                </div>
+                <div class="table-container">
+                    <table>
+                        <thead>
+                            <tr>
+                                <th>Cliente</th>
+                                <th>Cantidad (kg)</th>
+                                <th>Fecha Entrega</th>
+                                <th>Estado</th>
+                                <th>Acciones</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr>
+                                <td>Industrias del Mar S.A.</td>
+                                <td>15,000</td>
+                                <td>15/12/2024</td>
+                                <td><span class="status-badge normal">En Proceso</span></td>
+                                <td><button class="logout-btn" style="padding: 0.25rem 0.75rem; font-size: 0.875rem;">Ver Detalle</button></td>
+                            </tr>
+                            <tr>
+                                <td>AgroMar Ltda.</td>
+                                <td>8,500</td>
+                                <td>20/01/2025</td>
+                                <td><span class="status-badge low">Pendiente</span></td>
+                                <td><button class="logout-btn" style="padding: 0.25rem 0.75rem; font-size: 0.875rem;">Ver Detalle</button></td>
+                            </tr>
+                            <tr>
+                                <td>Exportadora Oceánica</td>
+                                <td>22,000</td>
+                                <td>05/02/2025</td>
+                                <td><span class="status-badge critical">Riesgo</span></td>
+                                <td><button class="logout-btn" style="padding: 0.25rem 0.75rem; font-size: 0.875rem;">Ver Detalle</button></td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+
+        <!-- Compras Tab -->
+        <div id="compras-tab" class="tab-content">
+            <div class="table-card">
+                <div class="table-header">
+                    <h2>Registro de Compras a Proveedores</h2>
+                </div>
+                <div class="table-container">
+                    <table>
+                        <thead>
+                            <tr>
+                                <th>Proveedor</th>
+                                <th>Producto</th>
+                                <th>Cantidad</th>
+                                <th>Fecha Pedido</th>
+                                <th>Fecha Estimada</th>
+                                <th>Estado</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr>
+                                <td>Cultivos Marinos del Sur</td>
+                                <td>Alga Húmeda</td>
+                                <td>5,000 kg</td>
+                                <td>10/11/2024</td>
+                                <td>25/11/2024</td>
+                                <td><span class="status-badge normal">En Tránsito</span></td>
+                            </tr>
+                            <tr>
+                                <td>Proveedora Pacífico</td>
+                                <td>Insumos Secado</td>
+                                <td>200 unidades</td>
+                                <td>15/11/2024</td>
+                                <td>28/11/2024</td>
+                                <td><span class="status-badge low">Demora (+2 días)</span></td>
+                            </tr>
+                            <tr>
+                                <td>Distribuidora Costa Verde</td>
+                                <td>Maxisacos Vacíos</td>
+                                <td>100 unidades</td>
+                                <td>18/11/2024</td>
+                                <td>30/11/2024</td>
+                                <td><span class="status-badge normal">Confirmado</span></td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+    </main>
+
+    <script>
+        // Tab switching functionality
+        function switchTab(tabName) {
+            // Hide all tab contents
+            document.querySelectorAll('.tab-content').forEach(content => {
+                content.classList.remove('active');
+            });
+            
+            // Remove active class from all tabs
+            document.querySelectorAll('.tab').forEach(tab => {
+                tab.classList.remove('active');
+            });
+            
+            // Show selected tab content
+            document.getElementById(tabName + '-tab').classList.add('active');
+            
+            // Add active class to clicked tab
+            document.querySelector(`[data-tab="${tabName}"]`).classList.add('active');
+        }
+
+        // Logout functionality
+        function handleLogout() {
+            if (confirm('¿Está seguro que desea cerrar sesión?')) {
+                // En Django, esto sería: window.location.href = '/logout/';
+                alert('Cerrando sesión...');
+            }
+        }
+
+        // Initialize Charts
+        window.addEventListener('DOMContentLoaded', function() {
+            // Proyección Mensual Chart
+            const proyeccionCtx = document.getElementById('proyeccionChart').getContext('2d');
+            const proyeccionChart = new Chart(proyeccionCtx, {
+                type: 'line',
+                data: {
+                    labels: ['Nov', 'Dic', 'Ene', 'Feb', 'Mar', 'Abr'],
+                    datasets: [
+                        {
+                            label: 'Real',
+                            data: [12500, null, null, null, null, null],
+                            borderColor: '#0891b2',
+                            backgroundColor: 'rgba(8, 145, 178, 0.1)',
+                            borderWidth: 2,
+                            tension: 0.4,
+                            pointRadius: 4,
+                            pointHoverRadius: 6
+                        },
+                        {
+                            label: 'Proyectado',
+                            data: [12000, 13200, 14500, 15800, 16200, 14800],
+                            borderColor: '#14b8a6',
+                            backgroundColor: 'rgba(20, 184, 166, 0.1)',
+                            borderWidth: 2,
+                            borderDash: [5, 5],
+                            tension: 0.4,
+                            pointRadius: 4,
+                            pointHoverRadius: 6
+                        },
+                        {
+                            label: 'Contractual',
+                            data: [11000, 12000, 13500, 14000, 15000, 14500],
+                            borderColor: '#ef4444',
+                            backgroundColor: 'rgba(239, 68, 68, 0.1)',
+                            borderWidth: 2,
+                            tension: 0.4,
+                            pointRadius: 4,
+                            pointHoverRadius: 6
+                        }
+                    ]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    plugins: {
+                        legend: {
+                            display: true,
+                            position: 'bottom'
+                        },
+                        tooltip: {
+                            mode: 'index',
+                            intersect: false
+                        }
+                    },
+                    scales: {
+                        y: {
+                            beginAtZero: false,
+                            ticks: {
+                                callback: function(value) {
+                                    return value.toLocaleString() + ' kg';
+                                }
+                            }
+                        }
+                    }
+                }
+            });
+
+            // Inventario Distribution Chart
+            const inventarioCtx = document.getElementById('inventarioChart').getContext('2d');
+            const inventarioChart = new Chart(inventarioCtx, {
+                type: 'doughnut',
+                data: {
+                    labels: ['Alga Húmeda', 'Alga Seca', 'Maxisaco'],
+                    datasets: [{
+                        data: [8500, 2400, 45],
+                        backgroundColor: [
+                            '#0891b2',
+                            '#14b8a6',
+                            '#10b981'
+                        ],
+                        borderWidth: 2,
+                        borderColor: '#ffffff'
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    plugins: {
+                        legend: {
+                            display: true,
+                            position: 'bottom'
+                        },
+                        tooltip: {
+                            callbacks: {
+                                label: function(context) {
+                                    const label = context.label || '';
+                                    const value = context.parsed || 0;
+                                    const total = context.dataset.data.reduce((a, b) => a + b, 0);
+                                    const percentage = ((value / total) * 100).toFixed(1);
+                                    return label + ': ' + value.toLocaleString() + ' (' + percentage + '%)';
+                                }
+                            }
+                        }
+                    }
+                }
+            });
+        });
+    </script>
+</body>
+</html>

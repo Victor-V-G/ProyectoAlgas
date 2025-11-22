@@ -1,0 +1,33 @@
+{% extends 'base.html' %}
+{% block content %}
+
+<h1>Contratos</h1>
+
+<a href="{% url 'contrato_crear' %}" class="btn btn-primary">Crear contrato</a>
+
+<table>
+  <tr>
+    <th>ID</th>
+    <th>Cliente</th>
+    <th>Tonelaje</th>
+    <th>Estado</th>
+    <th>Acciones</th>
+  </tr>
+
+  {% for c in contratos %}
+  <tr>
+    <td>{{ c.id }}</td>
+    <td>{{ c.cliente }}</td>
+    <td>{{ c.tonelaje_total }} T</td>
+    <td>{{ c.estado }}</td>
+    <td>
+      <a href="{% url 'contrato_detalle' c.id %}">Ver</a> |
+      <a href="{% url 'contrato_editar' c.id %}">Editar</a> |
+      <a href="{% url 'contrato_eliminar' c.id %}">Eliminar</a>
+    </td>
+  </tr>
+  {% endfor %}
+
+</table>
+
+{% endblock %}

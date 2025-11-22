@@ -25,7 +25,7 @@ def RenderLoginForm(request):
                 UsuarioLogeado = request.session.get('Usuario_Ingresado')
                 
                 if UsuarioLogeado == 'Admin':
-                    pass
+                    return redirect('Home')
                 else:
                     pass
 

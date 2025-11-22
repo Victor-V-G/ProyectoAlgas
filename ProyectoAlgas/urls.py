@@ -21,6 +21,9 @@ from LoginApp import views
 urlpatterns = [
     path('admin/', admin.site.urls),
 
-    path('', include('LoginApp.urls'))
+    path('', include('LoginApp.urls')),
 
+    path('', include('HomeApp.urls')),
+
+    path('', include('ContratoApp.urls')),
 ]

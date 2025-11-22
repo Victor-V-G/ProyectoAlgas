@@ -40,7 +40,9 @@ INSTALLED_APPS = [
     'django.contrib.staticfiles',
     'UsuariosApp.apps.UsuariosappConfig',
     'RolApp',
-    'LoginApp'
+    'LoginApp',
+    'HomeApp',
+    'ContratoApp'
 ]
 
 MIDDLEWARE = [
