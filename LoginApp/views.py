@@ -25,7 +25,7 @@ def RenderLoginForm(request):
                 UsuarioLogeado = request.session.get('Usuario_Ingresado')
                 
                 if UsuarioLogeado == 'Admin':
-                    return redirect('dashboard_ejecutivo')
+                    return redirect('dashboard')
                 else:
                     pass
 
@@ -35,6 +35,6 @@ def RenderLoginForm(request):
     return render(request, 'LoginTemplate/Form.html', data)
 
 
-def Logout(request):
+def RenderLogout(request):
     request.session.flush()
     return redirect('Login')

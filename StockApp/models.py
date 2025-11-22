@@ -1,9 +1,8 @@
 from django.db import models
-
-# Create your models here.
-from django.db import models
 from django.conf import settings
-from EspecieApp.models import Especie  # si manejas especies aparte
+from EspecieApp.models import Especie
+from UsuariosApp.models import UsuariosModels  # tu modelo REAL de usuario
+
 
 class Maxisaco(models.Model):
     especie = models.ForeignKey(Especie, on_delete=models.PROTECT)
@@ -12,7 +11,7 @@ class Maxisaco(models.Model):
 
     # Usuario que registró el maxisaco
     registrado_por = models.ForeignKey(
-        settings.AUTH_USER_MODEL,
+        UsuariosModels,   # ← CORREGIDO, YA NO USA AUTH_USER_MODEL
         on_delete=models.PROTECT,
         related_name="maxisacos_registrados"
     )
@@ -29,7 +28,7 @@ class Maxisaco(models.Model):
     # Auditoría
     fecha_actualizacion = models.DateTimeField(auto_now=True)
     actualizado_por = models.ForeignKey(
-        settings.AUTH_USER_MODEL,
+        UsuariosModels,   # ← CORREGIDO
         on_delete=models.PROTECT,
         related_name="maxisacos_actualizados",
         null=True,

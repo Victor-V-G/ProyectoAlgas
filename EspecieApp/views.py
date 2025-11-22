@@ -17,7 +17,7 @@ def especie_crear(request):
         if form.is_valid():
             form.save()
             messages.success(request, "Especie creada.")
-            return redirect("especies_list")
+            return redirect("especies")
     else:
         form = EspecieForm()
 
@@ -33,7 +33,7 @@ def especie_editar(request, id):
         if form.is_valid():
             form.save()
             messages.success(request, "Especie actualizada.")
-            return redirect("especies_list")
+            return redirect("especies")
     else:
         form = EspecieForm(instance=especie)
 
@@ -48,7 +48,7 @@ def especie_eliminar(request, id):
     especie = get_object_or_404(Especie, id=id)
     especie.delete()
     messages.success(request, "Especie eliminada.")
-    return redirect("especies_list")
+    return redirect("especies")
 
 
 

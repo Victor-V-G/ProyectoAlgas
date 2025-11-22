@@ -1,8 +1,6 @@
-
-
-# Create your models here.
 from django.db import models
-from django.conf import settings
+from UsuariosApp.models import UsuariosModels
+
 
 class Contrato(models.Model):
     cliente = models.CharField(max_length=200)
@@ -12,12 +10,16 @@ class Contrato(models.Model):
 
     # Auditoría
     creado_por = models.ForeignKey(
-        settings.AUTH_USER_MODEL, on_delete=models.PROTECT, related_name="contratos_creados"
+        UsuariosModels,
+        on_delete=models.PROTECT,
+        related_name="contratos_creados"
     )
     fecha_creacion = models.DateTimeField(auto_now_add=True)
 
     actualizado_por = models.ForeignKey(
-        settings.AUTH_USER_MODEL, on_delete=models.PROTECT, related_name="contratos_actualizados"
+        UsuariosModels,
+        on_delete=models.PROTECT,
+        related_name="contratos_actualizados"
     )
     fecha_actualizacion = models.DateTimeField(auto_now=True)
 
@@ -36,10 +38,21 @@ class Contrato(models.Model):
 
 
 class EntregaContrato(models.Model):
-    contrato = models.ForeignKey(Contrato, on_delete=models.CASCADE, related_name="entregas")
+    contrato = models.ForeignKey(
+        Contrato,
+        on_delete=models.CASCADE,
+        related_name="entregas"
+    )
+
+    # Mes correspondiente a la entrega
     mes = models.DateField()
+
     toneladas_requeridas = models.DecimalField(max_digits=10, decimal_places=2)
-    toneladas_cumplidas = models.DecimalField(max_digits=10, decimal_places=2, default=0)
+    toneladas_cumplidas = models.DecimalField(
+        max_digits=10,
+        decimal_places=2,
+        default=0
+    )
 
     def __str__(self):
-        return f"Entrega {self.mes} ({self.toneladas_requeridas}T)"
+        return f"Entrega {self.mes} - {self.toneladas_requeridas}T"
