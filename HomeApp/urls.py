@@ -14,5 +14,4 @@ urlpatterns = [
 
     path("auditoria/", include("AuditoriaApp.urls")),
 
-
 ]

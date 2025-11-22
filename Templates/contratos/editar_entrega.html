@@ -1,0 +1,28 @@
+{% extends "base.html" %}
+{% block title %}Editar Entrega{% endblock %}
+
+{% block content %}
+<h2>Editar Entrega del {{ entrega.mes }}</h2>
+
+<form method="POST">
+    {% csrf_token %}
+
+    <div class="form-group">
+        {{ form.mes.label_tag }}<br>
+        {{ form.mes }}
+    </div>
+
+    <div class="form-group">
+        {{ form.toneladas_requeridas.label_tag }}<br>
+        {{ form.toneladas_requeridas }}
+    </div>
+
+    <div class="form-group">
+        {{ form.toneladas_cumplidas.label_tag }}<br>
+        {{ form.toneladas_cumplidas }}
+    </div>
+
+    <button type="submit" class="btn btn-primary">Actualizar</button>
+    <a href="{% url 'contrato_detalle' entrega.contrato.id %}" class="btn btn-secondary">Cancelar</a>
+</form>
+{% endblock %}

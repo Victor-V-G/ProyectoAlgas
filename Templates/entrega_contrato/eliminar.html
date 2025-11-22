@@ -1,0 +1,13 @@
+{% extends "base.html" %}
+{% block content %}
+<h2>Eliminar entrega</h2>
+
+<p>¿Deseas eliminar esta entrega?</p>
+
+<form method="POST">
+    {% csrf_token %}
+    <button type="submit">Sí, eliminar</button>
+</form>
+
+<a href="{% url 'entrega-lista' %}">Cancelar</a>
+{% endblock %}

@@ -1,0 +1,29 @@
+{% extends "base.html" %}
+{% block content %}
+<h2>Entregas de Contratos</h2>
+
+<a href="{% url 'entrega-crear' %}">Nueva entrega</a>
+
+<table border="1" cellpadding="8">
+    <tr>
+        <th>Contrato</th>
+        <th>Mes</th>
+        <th>Requerido (t)</th>
+        <th>Cumplido (t)</th>
+        <th>Acciones</th>
+    </tr>
+
+    {% for e in entregas %}
+    <tr>
+        <td>{{ e.contrato }}</td>
+        <td>{{ e.mes }}</td>
+        <td>{{ e.toneladas_requeridas }}</td>
+        <td>{{ e.toneladas_cumplidas }}</td>
+        <td>
+            <a href="{% url 'entrega-editar' e.id %}">Editar</a>
+            <a href="{% url 'entrega-eliminar' e.id %}">Eliminar</a>
+        </td>
+    </tr>
+    {% endfor %}
+</table>
+{% endblock %}

@@ -1,35 +1,51 @@
-{% extends 'base.html' %}
+{% extends "base.html" %}
+{% block title %}Detalle del Contrato{% endblock %}
+
 {% block content %}
+<h2>Contrato #{{ contrato.id }} - {{ contrato.cliente }}</h2>
 
-<h1>Contrato {{ contrato.id }}</h1>
+<hr>
 
-<p><strong>Cliente:</strong> {{ contrato.cliente }}</p>
-<p><strong>Tonelaje total:</strong> {{ contrato.tonelaje_total }} T</p>
+<p><strong>Tonelaje total:</strong> {{ contrato.tonelaje_total }} Ton</p>
+<p><strong>Fecha inicio:</strong> {{ contrato.fecha_inicio }}</p>
+<p><strong>Fecha fin:</strong> {{ contrato.fecha_fin }}</p>
 <p><strong>Estado:</strong> {{ contrato.estado }}</p>
 
 <hr>
 
-<h2>Entregas</h2>
-<a href="{% url 'entrega_crear' contrato.id %}">Agregar entrega</a>
+<h3>Entregas Registradas</h3>
 
-<table>
-    <tr>
-        <th>Mes</th>
-        <th>Requerido</th>
-        <th>Cumplido</th>
-        <th>Acciones</th>
-    </tr>
+<a href="{% url 'entrega_crear' contrato.id %}" class="btn btn-primary">
+    ➕ Agregar Entrega
+</a>
 
-    {% for e in entregas %}
-    <tr>
-        <td>{{ e.mes }}</td>
-        <td>{{ e.toneladas_requeridas }} T</td>
-        <td>{{ e.toneladas_cumplidas }} T</td>
-        <td>
-            <a href="{% url 'entrega_editar' e.id %}">Editar</a>
-        </td>
-    </tr>
-    {% endfor %}
+<table class="table" style="margin-top: 15px;">
+    <thead>
+        <tr>
+            <th>Mes</th>
+            <th>Toneladas Requeridas</th>
+            <th>Toneladas Cumplidas</th>
+            <th>Acciones</th>
+        </tr>
+    </thead>
+    <tbody>
+        {% for e in entregas %}
+        <tr>
+            <td>{{ e.mes }}</td>
+            <td>{{ e.toneladas_requeridas }}</td>
+            <td>{{ e.toneladas_cumplidas }}</td>
+            <td>
+                <a href="{% url 'entrega_editar' e.id %}" class="btn btn-sm btn-warning">Editar</a>
+            </td>
+        </tr>
+        {% empty %}
+        <tr>
+            <td colspan="4">No hay entregas registradas.</td>
+        </tr>
+        {% endfor %}
+    </tbody>
 </table>
+
+<a href="{% url 'contratos' %}" class="btn btn-secondary">Volver</a>
 
 {% endblock %}

@@ -46,7 +46,9 @@ INSTALLED_APPS = [
     'StockApp',
     'EspecieApp',
     'InsumoApp',
-    'AuditoriaApp'
+    'AuditoriaApp',
+    'ProyeccionesApp',
+    
 ]
 
 MIDDLEWARE = [
@@ -137,3 +139,10 @@ STATICFILES_DIRS = [os.path.join(BASE_DIR, 'static')]
 # https://docs.djangoproject.com/en/5.2/ref/settings/#default-auto-field
 
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
+
+# ==========================
+#  CONFIG MONGODB (Proyecciones)
+# ==========================
+MONGO_URI = "mongodb://localhost:27017/"
+MONGO_DB_NAME = "proyecto_algas_db"
+MONGO_COLLECTION_PROYECCIONES = "proyecciones"
