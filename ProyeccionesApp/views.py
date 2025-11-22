@@ -1,8 +1,14 @@
-from django.shortcuts import render, redirect
+# ProyeccionesApp/views.py
+from django.shortcuts import redirect
+from django.contrib import messages
 
-# Create your views here.
-from django.shortcuts import render
-from ProyectoAlgas.mongo import get_mongo_connection
+from .services import generar_proyecciones_automaticas
 
-def proyecciones_dashboard(request):
-    return redirect("dashboard")  # o eliminar vista completa
+def actualizar_proyecciones(request):
+    """
+    Llama al microservicio, genera proyecciones y las guarda en MongoDB.
+    Luego redirige al dashboard principal.
+    """
+    generar_proyecciones_automaticas()
+    messages.success(request, "Proyecciones actualizadas desde el microservicio.")
+    return redirect("dashboard")

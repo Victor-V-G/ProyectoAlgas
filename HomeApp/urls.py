@@ -14,4 +14,5 @@ urlpatterns = [
 
     path("auditoria/", include("AuditoriaApp.urls")),
 
+    path("proyecciones/", include("ProyeccionesApp.urls")),
 ]

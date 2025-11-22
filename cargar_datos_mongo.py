@@ -1,7 +1,5 @@
-# cargar_datos_mongo.py
+# limpiar_mongo.py
 from pymongo import MongoClient
-from datetime import datetime
-import random
 
 # ===============================================
 # CONFIGURACIÓN MONGO
@@ -12,63 +10,24 @@ COLLECTION_NAME = "proyecciones"
 
 client = MongoClient(MONGO_URI)
 db = client[DB_NAME]
-collection = db[COLLECTION_NAME]
 
-
-# ===============================================
-# DATOS DE EJEMPLO
-# ===============================================
-especies = ["Luga Roja", "Luga Negra", "Pelillo"]
-
-anio_actual = datetime.now().year
-
-
-def generar_proyeccion_base(mes):
-    """
-    Genera un valor base de producción dependiendo del mes.
-    Útil para que los datos se vean más reales.
-    """
-    if mes in (1, 2, 3):        # verano
-        return random.randint(9000, 14000)
-    elif mes in (4, 5, 6):      # otoño
-        return random.randint(7000, 12000)
-    elif mes in (7, 8, 9):      # invierno
-        return random.randint(4000, 9000)
-    else:                      # primavera
-        return random.randint(8000, 13000)
-
+print("🧹 Iniciando limpieza total de MongoDB…")
 
 # ===============================================
-# LIMPIAR COLECCIÓN ANTES DE INSERTAR
+# ELIMINAR TODAS LAS COLECCIONES DEL DATABASE
 # ===============================================
-collection.delete_many({})
-print("🧹 Colección 'proyecciones' limpiada.")
+colecciones = db.list_collection_names()
 
+for col in colecciones:
+    db[col].drop()
+    print(f"🗑️ Colección eliminada: {col}")
+
+print("✔ Todas las colecciones fueron eliminadas.")
 
 # ===============================================
-# GENERAR DATOS
+# CREAR SOLO LA COLECCIÓN proyecciones (vacía)
 # ===============================================
-documentos = []
+db.create_collection(COLLECTION_NAME)
+print(f"📁 Colección creada nuevamente: {COLLECTION_NAME}")
 
-for mes in range(1, 13):
-    base = generar_proyeccion_base(mes)
-
-    for especie in especies:
-        proyeccion = base + random.randint(-500, 500)
-        real = proyeccion + random.randint(-800, 800)
-
-        doc = {
-            "especie": especie,
-            "anio": anio_actual,
-            "mes": mes,
-            "proyeccion_ton": float(proyeccion),
-            "real_ton": float(max(real, 0)),
-        }
-
-        documentos.append(doc)
-
-collection.insert_many(documentos)
-
-print(f"✅ Se insertaron {len(documentos)} documentos en MongoDB.")
-print("📌 Colección: proyecto_algas_db → proyecciones")
-print("🚀 Ahora abre tu dashboard y verás los gráficos con datos reales.")
+print("✅ Base limpia y lista.")

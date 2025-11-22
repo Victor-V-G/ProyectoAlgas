@@ -211,21 +211,36 @@
 {% block content %}
 <div class="page-wrapper">
 
-    <!-- Encabezado -->
+    <!-- ENCABEZADO -->
     <div class="top-bar">
         <div class="top-bar-left">
             <h1>Dashboard Ejecutivo</h1>
             <span>Sistema de Gestión de Algas</span>
         </div>
+
+        <!-- 🔄 BOTÓN DE ACTUALIZAR PROYECCIONES -->
         <div class="top-bar-right">
-            {% if usuario.is_authenticated %}
-                <div>{{ usuario.get_full_name|default:usuario.username }}</div>
-                <div style="font-size: 0.8rem; color: #9ca3af;">Gerente Comercial</div>
-            {% endif %}
+            <div style="font-size: 0.9rem; color: #4b5563;">Gerente Comercial</div>
+
+            <div style="margin-top: 8px;">
+                <a href="{% url 'proyecciones_actualizar' %}"
+                   style="
+                        padding: 7px 12px;
+                        background:#0f766e;
+                        color:white;
+                        border-radius:6px;
+                        text-decoration:none;
+                        font-size:0.85rem;
+                        font-weight:600;
+                        box-shadow:0 1px 3px rgba(0,0,0,0.15);
+                   ">
+                    🔄 Actualizar Proyecciones
+                </a>
+            </div>
         </div>
     </div>
 
-    <!-- Tabs -->
+    <!-- TABS -->
     <div class="tabs">
         <div class="tab-item activo">📊 Dashboard</div>
         <div class="tab-item">📄 Contratos</div>
@@ -239,16 +254,19 @@
             <div class="kpi-value">{{ cumplimiento_contractual }}%</div>
             <div class="kpi-delta positivo">+2%</div>
         </div>
+
         <div class="kpi-card">
             <div class="kpi-title">Producción Mensual</div>
             <div class="kpi-value">{{ produccion_mensual|floatformat:1 }} Ton</div>
             <div class="kpi-delta positivo">+8%</div>
         </div>
+
         <div class="kpi-card">
             <div class="kpi-title">Inventario Total</div>
             <div class="kpi-value">{{ inventario_total|floatformat:1 }} Ton</div>
             <div class="kpi-delta negativo">-3%</div>
         </div>
+
         <div class="kpi-card">
             <div class="kpi-title">Ingresos Proyectados</div>
             <div class="kpi-value">${{ ingresos_proyectados|floatformat:0 }} CLP</div>
@@ -256,39 +274,17 @@
         </div>
     </div>
 
-    <!-- Alertas -->
+    <!-- ALERTAS -->
     <div class="section-card">
         <div class="section-header">⚠ Alertas Tempranas</div>
 
         <div class="alerts-list">
             {% if alertas %}
                 {% for a in alertas %}
-
-                    {% if a.nivel == "alto" %}
-                        {% with clase="alert-alto" %}
-                            <div class="alert-item {{ clase }}">
-                                <div class="alert-title">{{ a.titulo }}</div>
-                                <div class="alert-detail">{{ a.detalle }}</div>
-                            </div>
-                        {% endwith %}
-
-                    {% elif a.nivel == "medio" %}
-                        {% with clase="alert-medio" %}
-                            <div class="alert-item {{ clase }}">
-                                <div class="alert-title">{{ a.titulo }}</div>
-                                <div class="alert-detail">{{ a.detalle }}</div>
-                            </div>
-                        {% endwith %}
-
-                    {% else %}
-                        {% with clase="alert-bajo" %}
-                            <div class="alert-item {{ clase }}">
-                                <div class="alert-title">{{ a.titulo }}</div>
-                                <div class="alert-detail">{{ a.detalle }}</div>
-                            </div>
-                        {% endwith %}
-                    {% endif %}
-
+                    <div class="alert-item alert-{{ a.nivel }}">
+                        <div class="alert-title">{{ a.titulo }}</div>
+                        <div class="alert-detail">{{ a.detalle }}</div>
+                    </div>
                 {% endfor %}
             {% else %}
                 <div class="alert-item">
@@ -299,7 +295,7 @@
         </div>
     </div>
 
-    <!-- Gráficos -->
+    <!-- GRÁFICOS -->
     <div class="grid-2">
         <div class="section-card">
             <div class="section-header">📅 Proyección Mensual vs Contractual</div>
@@ -312,9 +308,10 @@
         </div>
     </div>
 
-    <!-- Inventario -->
+    <!-- INVENTARIO -->
     <div class="section-card inventario-tabla">
         <div class="section-header">📊 Inventario Actual</div>
+
         <table>
             <thead>
                 <tr>
@@ -324,6 +321,7 @@
                     <th>Estado</th>
                 </tr>
             </thead>
+
             <tbody>
                 {% for item in inventario_especies %}
                 <tr>
@@ -352,7 +350,9 @@
 
 {% block extra_js %}
 <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+
 <script>
+
     const proyData = JSON.parse(`{{ chart_proy_vs_contractual|escapejs }}`);
     const invLabels = JSON.parse(`{{ chart_inv_labels|escapejs }}`);
     const invData = JSON.parse(`{{ chart_inv_data|escapejs }}`);
@@ -404,5 +404,6 @@
             }]
         }
     });
+
 </script>
 {% endblock %}

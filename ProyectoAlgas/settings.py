@@ -146,3 +146,9 @@ DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 MONGO_URI = "mongodb://localhost:27017/"
 MONGO_DB_NAME = "proyecto_algas_db"
 MONGO_COLLECTION_PROYECCIONES = "proyecciones"
+
+
+# ==========================
+#  URL MICROSERVICIO PROYECCIONES
+# ==========================
+PROYECCIONES_MICRO_URL = "http://127.0.0.1:8001/api/proyectar"
