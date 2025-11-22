@@ -5,7 +5,7 @@ from django.shortcuts import render, redirect, get_object_or_404
 from django.contrib import messages
 from .models import Contrato, EntregaContrato
 from .forms import ContratoForm, EntregaContratoForm
-
+from AuditoriaApp.decorators import auditar
 
 from UsuariosApp.models import UsuariosModels
 
@@ -25,7 +25,8 @@ def contratos_list(request):
     contratos = Contrato.objects.all().order_by("-id")
     return render(request, "contratos/lista.html", {"contratos": contratos})
 
-
+@auditar("crear", "Contrato",
+         lambda req, *a, **k: f"Contrato creado para cliente {req.POST.get('cliente')}")
 def contrato_crear(request):
     usuario = get_user_from_session(request)
 
@@ -43,7 +44,8 @@ def contrato_crear(request):
 
     return render(request, "contratos/crear.html", {"form": form})
 
-
+@auditar("editar", "Contrato",
+         lambda req, *a, **k: f"Contrato ID {k['id']} editado")
 def contrato_editar(request, id):
     usuario = get_user_from_session(request)
     contrato = get_object_or_404(Contrato, id=id)
@@ -61,7 +63,8 @@ def contrato_editar(request, id):
 
     return render(request, "contratos/editar.html", {"form": form, "contrato": contrato})
 
-
+@auditar("eliminar", "Contrato",
+         lambda req, *a, **k: f"Contrato ID {k['id']} eliminado")
 def contrato_eliminar(request, id):
     contrato = get_object_or_404(Contrato, id=id)
     contrato.delete()
@@ -77,7 +80,8 @@ def contrato_detalle(request, id):
         "entregas": entregas
     })
 
-
+@auditar("crear", "Entrega Contrato",
+         lambda req, *a, **k: f"Nueva entrega agregada al contrato {k['contrato_id']}")
 def entrega_crear(request, contrato_id):
     contrato = get_object_or_404(Contrato, id=contrato_id)
 

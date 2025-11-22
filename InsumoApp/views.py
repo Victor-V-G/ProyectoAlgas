@@ -3,6 +3,7 @@ from django.shortcuts import render
 # Create your views here.
 # utils.py dentro de InsumoApp
 from UsuariosApp.models import UsuariosModels
+from AuditoriaApp.decorators import auditar
 
 def get_user_from_session(request):
     username = request.session.get("Usuario_Ingresado")
@@ -26,7 +27,11 @@ def insumos_list(request):
     insumos = Insumo.objects.all().order_by("nombre")
     return render(request, "insumos/lista.html", {"insumos": insumos})
 
-
+@auditar(
+    accion="crear",
+    modulo="Insumos",
+    detalle=lambda req, *a, **k: f"Creado insumo '{req.POST.get('nombre')}'"
+)
 def insumo_crear(request):
     usuario = get_user_from_session(request)
 
@@ -44,7 +49,11 @@ def insumo_crear(request):
 
     return render(request, "insumos/crear.html", {"form": form})
 
-
+@auditar(
+    accion="editar",
+    modulo="Insumos",
+    detalle=lambda req, *a, **k: f"Insumo ID {k['id']} editado"
+)
 def insumo_editar(request, id):
     usuario = get_user_from_session(request)
     insumo = get_object_or_404(Insumo, id=id)
@@ -63,6 +72,11 @@ def insumo_editar(request, id):
     return render(request, "insumos/editar.html", {"form": form, "insumo": insumo})
 
 
+@auditar(
+    accion="eliminar",
+    modulo="Insumos",
+    detalle=lambda req, *a, **k: f"Insumo ID {k['id']} eliminado"
+)
 def insumo_eliminar(request, id):
     insumo = get_object_or_404(Insumo, id=id)
     insumo.delete()

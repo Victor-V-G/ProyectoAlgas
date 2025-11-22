@@ -12,4 +12,7 @@ urlpatterns = [
 
     path("insumos/", include("InsumoApp.urls")),
 
+    path("auditoria/", include("AuditoriaApp.urls")),
+
+
 ]

@@ -3,7 +3,7 @@ from django.contrib import messages
 from UsuariosApp.models import UsuariosModels # tu modelo real de usuario
 from .models import Maxisaco
 from .forms import MaxisacoForm
-
+from AuditoriaApp.decorators import auditar
 
 def get_user_from_session(request):
     """
@@ -24,7 +24,8 @@ def stock_list(request):
     maxisacos = Maxisaco.objects.all().order_by("-fecha_registro")
     return render(request, "stock/lista.html", {"maxisacos": maxisacos})
 
-
+@auditar("crear", "Stock",
+         lambda req, *a, **k: f"Creado Maxisaco para especie {req.POST.get('especie')} con {req.POST.get('peso_kg')} kg")
 def stock_crear(request):
     usuario = get_user_from_session(request)
 
@@ -44,7 +45,8 @@ def stock_crear(request):
 
     return render(request, "stock/crear.html", {"form": form})
 
-
+@auditar("editar", "Stock",
+         lambda req, *a, **k: f"Editado Maxisaco ID {k['id']}")
 def stock_editar(request, id):
     usuario = get_user_from_session(request)
     m = get_object_or_404(Maxisaco, id=id)
@@ -62,7 +64,8 @@ def stock_editar(request, id):
 
     return render(request, "stock/editar.html", {"form": form, "maxisaco": m})
 
-
+@auditar("eliminar", "Stock",
+         lambda req, *a, **k: f"Eliminado Maxisaco ID {k['id']}")
 def stock_eliminar(request, id):
     m = get_object_or_404(Maxisaco, id=id)
     m.delete()

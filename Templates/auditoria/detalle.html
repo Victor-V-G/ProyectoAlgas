@@ -1,0 +1,20 @@
+{% extends "base.html" %}
+
+{% block title %}Detalle Auditoría{% endblock %}
+
+{% block content %}
+
+<h1>Detalle de Auditoría</h1>
+
+<p><strong>Fecha:</strong> {{ a.fecha|date:"d/m/Y H:i" }}</p>
+<p><strong>Usuario:</strong> {{ a.usuario.Username }}</p>
+<p><strong>Módulo:</strong> {{ a.modulo }}</p>
+<p><strong>Acción:</strong> {{ a.accion }}</p>
+
+<p><strong>Detalle:</strong><br>
+{{ a.detalle|default:"(Sin detalles)" }}
+</p>
+
+<a href="{% url 'auditoria' %}">Volver</a>
+
+{% endblock %}

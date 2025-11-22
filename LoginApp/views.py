@@ -3,9 +3,11 @@ from . import forms
 from UsuariosApp.models import UsuariosModels
 from django.contrib import messages
 from django.contrib.auth.hashers import check_password
+from AuditoriaApp.decorators import auditar
 # Create your views here.
 
-
+@auditar("login", "Autenticación",
+         lambda req, *a, **k: f"Intento de login usuario '{req.POST.get('UsernameField')}'")
 def RenderLoginForm(request):
     form = forms.LoginForm(request.POST)
     data = {'form': form}
@@ -34,7 +36,7 @@ def RenderLoginForm(request):
 
     return render(request, 'LoginTemplate/Form.html', data)
 
-
+@auditar("logout", "Autenticación", "Cierre de sesión")
 def RenderLogout(request):
     request.session.flush()
     return redirect('Login')

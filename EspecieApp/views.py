@@ -5,12 +5,13 @@ from django.shortcuts import render, redirect, get_object_or_404
 from django.contrib import messages
 from .models import Especie
 from .forms import EspecieForm
+from AuditoriaApp.decorators import auditar
 
 def especies_list(request):
     especies = Especie.objects.all().order_by("nombre")
     return render(request, "especies/lista.html", {"especies": especies})
 
-
+@auditar("crear", "Especie", lambda req, *a, **k: f"Creada especie '{req.POST.get('nombre')}'")
 def especie_crear(request):
     if request.method == "POST":
         form = EspecieForm(request.POST)
@@ -24,7 +25,8 @@ def especie_crear(request):
     return render(request, "especies/crear.html", {"form": form})
 
 
-
+@auditar("editar", "Especie",
+         lambda req, *a, **k: f"Editada especie ID {k['id']}")
 def especie_editar(request, id):
     especie = get_object_or_404(Especie, id=id)
 
@@ -43,7 +45,8 @@ def especie_editar(request, id):
     })
 
 
-
+@auditar("eliminar", "Especie",
+         lambda req, *a, **k: f"Eliminada especie ID {k['id']}")
 def especie_eliminar(request, id):
     especie = get_object_or_404(Especie, id=id)
     especie.delete()
