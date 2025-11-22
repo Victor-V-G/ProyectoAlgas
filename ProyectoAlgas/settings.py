@@ -45,6 +45,8 @@ INSTALLED_APPS = [
     'ContratoApp',
     'StockApp',
     'EspecieApp',
+    'InsumoApp',
+    'AuditoriaApp'
 ]
 
 MIDDLEWARE = [

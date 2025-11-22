@@ -1,0 +1,15 @@
+{% extends "base.html" %}
+
+{% block title %}Registrar Insumo{% endblock %}
+
+{% block content %}
+<h2>{{ insumo|default:"Nuevo Insumo" }}</h2>
+
+<form method="POST">
+    {% csrf_token %}
+    {{ form.as_p }}
+    <button type="submit">Guardar</button>
+</form>
+
+<a href="{% url 'insumos' %}">← Volver</a>
+{% endblock %}

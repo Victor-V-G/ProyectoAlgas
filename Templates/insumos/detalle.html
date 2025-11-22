@@ -1,0 +1,13 @@
+{% extends "base.html" %}
+
+{% block title %}Detalle Insumo{% endblock %}
+
+{% block content %}
+<h2>{{ insumo.nombre }}</h2>
+
+<p><strong>Descripción:</strong> {{ insumo.descripcion }}</p>
+<p><strong>Cantidad:</strong> {{ insumo.cantidad }} {{ insumo.get_unidad_display }}</p>
+<p><strong>Mínimo de seguridad:</strong> {{ insumo.minimo_seguridad }}</p>
+
+<a href="{% url 'insumo_editar' insumo.id %}">Editar</a>
+{% endblock %}

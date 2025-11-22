@@ -1,0 +1,43 @@
+{% extends "base.html" %}
+
+{% block title %}Insumos{% endblock %}
+
+{% block content %}
+<h2>Insumos</h2>
+
+<a href="{% url 'insumo_crear' %}" class="btn">Agregar Insumo</a>
+
+<table>
+    <tr>
+        <th>Nombre</th>
+        <th>Cantidad</th>
+        <th>Unidad</th>
+        <th>Estado</th>
+        <th>Opciones</th>
+    </tr>
+
+    {% for i in insumos %}
+    <tr>
+        <td>{{ i.nombre }}</td>
+        <td>{{ i.cantidad }}</td>
+        <td>{{ i.get_unidad_display }}</td>
+
+        <td>
+            {% if i.estado_stock == "normal" %}
+                <span style="color: green;">Normal</span>
+            {% elif i.estado_stock == "bajo" %}
+                <span style="color: orange;">Bajo</span>
+            {% else %}
+                <span style="color: red;">Sin stock</span>
+            {% endif %}
+        </td>
+
+        <td>
+            <a href="{% url 'insumo_detalle' i.id %}">Ver</a> |
+            <a href="{% url 'insumo_editar' i.id %}">Editar</a> |
+            <a href="{% url 'insumo_eliminar' i.id %}">Eliminar</a>
+        </td>
+    </tr>
+    {% endfor %}
+</table>
+{% endblock %}
