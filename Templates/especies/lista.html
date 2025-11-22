@@ -1,0 +1,30 @@
+{% extends 'base.html' %}
+{% block content %}
+
+<h1>Especies de Algas</h1>
+
+<a href="{% url 'especie_crear' %}" class="btn btn-primary">Registrar especie</a>
+
+<table>
+  <tr>
+    <th>ID</th>
+    <th>Nombre</th>
+    <th>Proporción</th>
+    <th>Acciones</th>
+  </tr>
+
+  {% for e in especies %}
+  <tr>
+    <td>{{ e.id }}</td>
+    <td>{{ e.nombre }}</td>
+    <td>{{ e.proporcion_conversion }} : 1</td>
+    <td>
+      <a href="{% url 'especie_detalle' e.id %}">Ver</a> |
+      <a href="{% url 'especie_editar' e.id %}">Editar</a> |
+      <a href="{% url 'especie_eliminar' e.id %}">Eliminar</a>
+    </td>
+  </tr>
+  {% endfor %}
+</table>
+
+{% endblock %}

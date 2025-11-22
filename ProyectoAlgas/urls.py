@@ -23,7 +23,5 @@ urlpatterns = [
 
     path('', include('LoginApp.urls')),
 
-    path('', include('HomeApp.urls')),
-
-    path('', include('ContratoApp.urls')),
+    path("dashboard/", include("HomeApp.urls")),
 ]

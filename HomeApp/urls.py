@@ -1,9 +1,6 @@
-
 from django.urls import path
-from .views import RenderHome
+from . import views
 
 urlpatterns = [
-
-    path('home/', RenderHome, name='Home'),
-
+    path('', views.dashboard_ejecutivo, name="dashboard_ejecutivo"),
 ]

@@ -1,0 +1,12 @@
+{% extends 'base.html' %}
+{% block content %}
+
+<h1>{{ especie.nombre }}</h1>
+
+<p><strong>Descripción:</strong> {{ especie.descripcion }}</p>
+<p><strong>Proporción de conversión:</strong> {{ especie.proporcion_conversion }} : 1</p>
+<p><strong>Creado:</strong> {{ especie.fecha_creacion }}</p>
+
+<a href="{% url 'especie_editar' especie.id %}">Editar</a>
+
+{% endblock %}

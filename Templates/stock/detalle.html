@@ -1,0 +1,15 @@
+{% extends 'base.html' %}
+{% block content %}
+
+<h1>Detalle de Registro</h1>
+
+<p><strong>Especie:</strong> {{ m.especie.nombre }}</p>
+<p><strong>Peso:</strong> {{ m.peso_kg }} kg</p>
+<p><strong>Movimiento:</strong> {{ m.tipo_movimiento }}</p>
+<p><strong>Fecha de Registro:</strong> {{ m.fecha_registro }}</p>
+<p><strong>Registrado por:</strong> {{ m.registrado_por.username }}</p>
+<p><strong>Observaciones:</strong> {{ m.observaciones }}</p>
+
+<a href="{% url 'stock_editar' m.id %}">Editar</a>
+
+{% endblock %}

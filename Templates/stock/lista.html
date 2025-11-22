@@ -1,0 +1,34 @@
+{% extends 'base.html' %}
+{% block content %}
+
+<h1>Inventario de Maxisacos</h1>
+
+<a href="{% url 'stock_crear' %}" class="btn btn-primary">Registrar stock</a>
+
+<table>
+  <tr>
+    <th>ID</th>
+    <th>Especie</th>
+    <th>Peso (kg)</th>
+    <th>Movimiento</th>
+    <th>Fecha</th>
+    <th>Acciones</th>
+  </tr>
+
+  {% for m in maxisacos %}
+  <tr>
+    <td>{{ m.id }}</td>
+    <td>{{ m.especie.nombre }}</td>
+    <td>{{ m.peso_kg }}</td>
+    <td>{{ m.tipo_movimiento }}</td>
+    <td>{{ m.fecha_registro }}</td>
+    <td>
+      <a href="{% url 'stock_detalle' m.id %}">Ver</a> |
+      <a href="{% url 'stock_editar' m.id %}">Editar</a> |
+      <a href="{% url 'stock_eliminar' m.id %}">Eliminar</a>
+    </td>
+  </tr>
+  {% endfor %}
+</table>
+
+{% endblock %}

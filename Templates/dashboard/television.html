@@ -1,0 +1,408 @@
+{% extends "base.html" %}
+
+{% block title %}Dashboard Ejecutivo{% endblock %}
+
+{% block extra_css %}
+<style>
+    .page-wrapper {
+        display: flex;
+        flex-direction: column;
+        gap: 1.5rem;
+    }
+
+    .top-bar {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+    }
+
+    .top-bar-left h1 {
+        margin: 0;
+        font-size: 1.4rem;
+    }
+
+    .top-bar-left span {
+        font-size: 0.9rem;
+        color: #6b7280;
+    }
+
+    .top-bar-right {
+        text-align: right;
+        font-size: 0.9rem;
+        color: #4b5563;
+    }
+
+    .kpi-grid {
+        display: grid;
+        grid-template-columns: repeat(4, minmax(0, 1fr));
+        gap: 1rem;
+    }
+
+    .kpi-card {
+        background: #ffffff;
+        border-radius: 12px;
+        padding: 1rem 1.25rem;
+        box-shadow: 0 1px 3px rgba(15, 23, 42, 0.08);
+        border: 1px solid #e5e7eb;
+    }
+
+    .kpi-title {
+        font-size: 0.9rem;
+        color: #6b7280;
+        margin-bottom: 0.4rem;
+    }
+
+    .kpi-value {
+        font-size: 1.4rem;
+        font-weight: 600;
+        margin-bottom: 0.2rem;
+        color: #111827;
+    }
+
+    .kpi-delta {
+        font-size: 0.85rem;
+    }
+
+    .kpi-delta.positivo {
+        color: #16a34a;
+    }
+
+    .kpi-delta.negativo {
+        color: #dc2626;
+    }
+
+    .section-card {
+        background: #ffffff;
+        border-radius: 14px;
+        padding: 1.25rem 1.5rem;
+        box-shadow: 0 1px 3px rgba(15, 23, 42, 0.08);
+        border: 1px solid #e5e7eb;
+    }
+
+    .section-header {
+        font-weight: 600;
+        margin-bottom: 0.75rem;
+        display: flex;
+        align-items: center;
+        gap: 0.5rem;
+        color: #111827;
+    }
+
+    .alerts-list {
+        display: flex;
+        flex-direction: column;
+        gap: 0.6rem;
+    }
+
+    .alert-item {
+        border-radius: 10px;
+        padding: 0.8rem 1rem;
+        border-left-width: 4px;
+        background: #f9fafb;
+    }
+
+    .alert-alto {
+        border-left-color: #ef4444;
+        background: #fef2f2;
+    }
+
+    .alert-medio {
+        border-left-color: #f97316;
+        background: #fffbeb;
+    }
+
+    .alert-bajo {
+        border-left-color: #3b82f6;
+        background: #eff6ff;
+    }
+
+    .alert-title {
+        font-weight: 600;
+        margin-bottom: 0.2rem;
+        font-size: 0.95rem;
+    }
+
+    .alert-detail {
+        font-size: 0.85rem;
+        color: #4b5563;
+    }
+
+    .grid-2 {
+        display: grid;
+        grid-template-columns: 2fr 1.3fr;
+        gap: 1rem;
+    }
+
+    .inventario-tabla table {
+        width: 100%;
+        border-collapse: collapse;
+        font-size: 0.9rem;
+    }
+
+    .inventario-tabla th,
+    .inventario-tabla td {
+        padding: 0.6rem 0.5rem;
+        border-bottom: 1px solid #e5e7eb;
+        text-align: left;
+    }
+
+    .inventario-tabla th {
+        font-weight: 600;
+        color: #6b7280;
+    }
+
+    .badge-estado {
+        display: inline-flex;
+        align-items: center;
+        padding: 0.15rem 0.6rem;
+        border-radius: 999px;
+        font-size: 0.75rem;
+    }
+
+    .badge-normal {
+        background: #ecfdf3;
+        color: #16a34a;
+    }
+
+    .badge-bajo {
+        background: #fef3c7;
+        color: #d97706;
+    }
+
+    .tabs {
+        display: flex;
+        gap: 1.5rem;
+        margin-top: 1rem;
+        margin-bottom: 1.5rem;
+        border-bottom: 1px solid #e5e7eb;
+    }
+
+    .tab-item {
+        padding-bottom: 0.6rem;
+        font-size: 0.9rem;
+        cursor: pointer;
+        color: #6b7280;
+        border-bottom: 2px solid transparent;
+    }
+
+    .tab-item.activo {
+        color: #0f766e;
+        border-bottom-color: #0f766e;
+        font-weight: 600;
+    }
+
+    @media (max-width: 992px) {
+        .kpi-grid {
+            grid-template-columns: repeat(2, minmax(0, 1fr));
+        }
+        .grid-2 {
+            grid-template-columns: 1fr;
+        }
+    }
+
+    @media (max-width: 640px) {
+        .kpi-grid {
+            grid-template-columns: 1fr;
+        }
+    }
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="page-wrapper">
+
+    <!-- Encabezado -->
+    <div class="top-bar">
+        <div class="top-bar-left">
+            <h1>Dashboard Ejecutivo</h1>
+            <span>Sistema de Gestión de Algas</span>
+        </div>
+        <div class="top-bar-right">
+            {% if usuario.is_authenticated %}
+                <div>{{ usuario.get_full_name|default:usuario.username }}</div>
+                <div style="font-size: 0.8rem; color: #9ca3af;">Gerente Comercial</div>
+            {% endif %}
+        </div>
+    </div>
+
+    <!-- Tabs -->
+    <div class="tabs">
+        <div class="tab-item activo">📊 Dashboard</div>
+        <div class="tab-item">📄 Contratos</div>
+        <div class="tab-item">🧾 Compras</div>
+    </div>
+
+    <!-- KPIs -->
+    <div class="kpi-grid">
+        <div class="kpi-card">
+            <div class="kpi-title">Cumplimiento Contractual</div>
+            <div class="kpi-value">{{ cumplimiento_contractual }}%</div>
+            <div class="kpi-delta positivo">+2%</div>
+        </div>
+        <div class="kpi-card">
+            <div class="kpi-title">Producción Mensual</div>
+            <div class="kpi-value">{{ produccion_mensual|floatformat:1 }} Ton</div>
+            <div class="kpi-delta positivo">+8%</div>
+        </div>
+        <div class="kpi-card">
+            <div class="kpi-title">Inventario Total</div>
+            <div class="kpi-value">{{ inventario_total|floatformat:1 }} Ton</div>
+            <div class="kpi-delta negativo">-3%</div>
+        </div>
+        <div class="kpi-card">
+            <div class="kpi-title">Ingresos Proyectados</div>
+            <div class="kpi-value">${{ ingresos_proyectados|floatformat:0 }} CLP</div>
+            <div class="kpi-delta positivo">+12%</div>
+        </div>
+    </div>
+
+    <!-- Alertas -->
+    <div class="section-card">
+        <div class="section-header">⚠ Alertas Tempranas</div>
+
+        <div class="alerts-list">
+            {% if alertas %}
+                {% for a in alertas %}
+
+                    {% if a.nivel == "alto" %}
+                        {% with clase="alert-alto" %}
+                            <div class="alert-item {{ clase }}">
+                                <div class="alert-title">{{ a.titulo }}</div>
+                                <div class="alert-detail">{{ a.detalle }}</div>
+                            </div>
+                        {% endwith %}
+
+                    {% elif a.nivel == "medio" %}
+                        {% with clase="alert-medio" %}
+                            <div class="alert-item {{ clase }}">
+                                <div class="alert-title">{{ a.titulo }}</div>
+                                <div class="alert-detail">{{ a.detalle }}</div>
+                            </div>
+                        {% endwith %}
+
+                    {% else %}
+                        {% with clase="alert-bajo" %}
+                            <div class="alert-item {{ clase }}">
+                                <div class="alert-title">{{ a.titulo }}</div>
+                                <div class="alert-detail">{{ a.detalle }}</div>
+                            </div>
+                        {% endwith %}
+                    {% endif %}
+
+                {% endfor %}
+            {% else %}
+                <div class="alert-item">
+                    <div class="alert-title">Sin alertas críticas por el momento</div>
+                    <div class="alert-detail">El sistema no detecta riesgos inmediatos.</div>
+                </div>
+            {% endif %}
+        </div>
+    </div>
+
+    <!-- Gráficos -->
+    <div class="grid-2">
+        <div class="section-card">
+            <div class="section-header">📅 Proyección Mensual vs Contractual</div>
+            <canvas id="chartProyeccion" height="120"></canvas>
+        </div>
+
+        <div class="section-card">
+            <div class="section-header">📦 Distribución de Inventario</div>
+            <canvas id="chartInventario" height="120"></canvas>
+        </div>
+    </div>
+
+    <!-- Inventario -->
+    <div class="section-card inventario-tabla">
+        <div class="section-header">📊 Inventario Actual</div>
+        <table>
+            <thead>
+                <tr>
+                    <th>Tipo / Especie</th>
+                    <th>Cantidad</th>
+                    <th>Unidad</th>
+                    <th>Estado</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for item in inventario_especies %}
+                <tr>
+                    <td>{{ item.nombre }}</td>
+                    <td>{{ item.cantidad|floatformat:1 }}</td>
+                    <td>{{ item.unidad }}</td>
+                    <td>
+                        {% if item.cantidad > 0 %}
+                            <span class="badge-estado badge-normal">Normal</span>
+                        {% else %}
+                            <span class="badge-estado badge-bajo">Sin stock</span>
+                        {% endif %}
+                    </td>
+                </tr>
+                {% empty %}
+                <tr>
+                    <td colspan="4">No hay datos de inventario registrados.</td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+<script>
+    const proyData = JSON.parse(`{{ chart_proy_vs_contractual|escapejs }}`);
+    const invLabels = JSON.parse(`{{ chart_inv_labels|escapejs }}`);
+    const invData = JSON.parse(`{{ chart_inv_data|escapejs }}`);
+
+    new Chart(document.getElementById('chartProyeccion'), {
+        type: 'line',
+        data: {
+            labels: proyData.labels,
+            datasets: [
+                {
+                    label: 'Contractual',
+                    data: proyData.contractual,
+                    borderColor: '#ef4444',
+                    backgroundColor: 'rgba(239, 68, 68, 0.08)',
+                    tension: 0.3
+                },
+                {
+                    label: 'Proyectado',
+                    data: proyData.proyectado,
+                    borderColor: '#14b8a6',
+                    backgroundColor: 'rgba(20, 184, 166, 0.08)',
+                    borderDash: [5, 5],
+                    tension: 0.3
+                },
+                {
+                    label: 'Real',
+                    data: proyData.real,
+                    borderColor: '#3b82f6',
+                    backgroundColor: 'rgba(59, 130, 246, 0.08)',
+                    tension: 0.3
+                },
+            ]
+        }
+    });
+
+    new Chart(document.getElementById('chartInventario'), {
+        type: 'pie',
+        data: {
+            labels: invLabels,
+            datasets: [{
+                data: invData,
+                backgroundColor: [
+                    '#0f766e',
+                    '#14b8a6',
+                    '#22c55e',
+                    '#3b82f6',
+                    '#eab308'
+                ]
+            }]
+        }
+    });
+</script>
+{% endblock %}

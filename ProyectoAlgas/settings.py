@@ -42,7 +42,9 @@ INSTALLED_APPS = [
     'RolApp',
     'LoginApp',
     'HomeApp',
-    'ContratoApp'
+    'ContratoApp',
+    'StockApp',
+    'EspecieApp',
 ]
 
 MIDDLEWARE = [
