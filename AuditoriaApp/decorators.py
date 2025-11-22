@@ -14,38 +14,31 @@ def get_user_from_session(request):
 
 
 def auditar(accion, modulo, detalle=None):
-    """
-    Decorador universal para registrar automáticamente auditoría.
-
-    Ejemplo:
-        @auditar("crear", "Especie")
-        def especie_crear(...):
-            ...
-
-    Parametros:
-        accion  -> "crear", "editar", "eliminar", "login", etc.
-        modulo  -> "Stock", "Insumo", "Contrato", etc.
-        detalle -> puede ser string estático o una función que recibe (request, args, kwargs)
-    """
 
     def decorator(view_func):
         @wraps(view_func)
         def wrapper(request, *args, **kwargs):
+
             respuesta = view_func(request, *args, **kwargs)
 
-            # Caso detalle dinámico
-            if callable(detalle):
-                valor_detalle = detalle(request, *args, **kwargs)
-            else:
-                valor_detalle = detalle
+            # Registrar auditoría SOLO si la operación fue exitosa:
+            # Es decir, si el view hizo redirect (código 302)
+            if request.method == "POST" and hasattr(respuesta, "status_code") and respuesta.status_code in (301, 302):
 
-            registrar_auditoria(
-                request=request,
-                accion=accion,
-                modulo=modulo,
-                detalle=valor_detalle
-            )
+                # Detalle dinámico
+                if callable(detalle):
+                    valor_detalle = detalle(request, *args, **kwargs)
+                else:
+                    valor_detalle = detalle
+
+                registrar_auditoria(
+                    request=request,
+                    accion=accion,
+                    modulo=modulo,
+                    detalle=valor_detalle
+                )
 
             return respuesta
+
         return wrapper
     return decorator
