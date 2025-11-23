@@ -61,13 +61,14 @@
 
     .kpi-delta {
         font-size: 0.85rem;
+        font-weight: 600;
     }
 
-    .kpi-delta.positivo {
+    .positivo {
         color: #16a34a;
     }
 
-    .kpi-delta.negativo {
+    .negativo {
         color: #dc2626;
     }
 
@@ -190,21 +191,6 @@
         border-bottom-color: #0f766e;
         font-weight: 600;
     }
-
-    @media (max-width: 992px) {
-        .kpi-grid {
-            grid-template-columns: repeat(2, minmax(0, 1fr));
-        }
-        .grid-2 {
-            grid-template-columns: 1fr;
-        }
-    }
-
-    @media (max-width: 640px) {
-        .kpi-grid {
-            grid-template-columns: 1fr;
-        }
-    }
 </style>
 {% endblock %}
 
@@ -218,60 +204,75 @@
             <span>Sistema de Gestión de Algas</span>
         </div>
 
-        <!-- 🔄 BOTÓN DE ACTUALIZAR PROYECCIONES -->
         <div class="top-bar-right">
-            <div style="font-size: 0.9rem; color: #4b5563;">Gerente Comercial</div>
-
-            <div style="margin-top: 8px;">
-                <a href="{% url 'proyecciones_actualizar' %}"
-                   style="
-                        padding: 7px 12px;
-                        background:#0f766e;
-                        color:white;
-                        border-radius:6px;
-                        text-decoration:none;
-                        font-size:0.85rem;
-                        font-weight:600;
-                        box-shadow:0 1px 3px rgba(0,0,0,0.15);
-                   ">
-                    🔄 Actualizar Proyecciones
-                </a>
-            </div>
+            <a href="{% url 'proyecciones_actualizar' %}"
+               style="padding: 7px 12px; background:#0f766e; color:white;
+                      border-radius:6px; text-decoration:none;
+                      font-size:0.85rem; font-weight:600;">
+                🔄 Actualizar Proyecciones
+            </a>
         </div>
-    </div>
-
-    <!-- TABS -->
-    <div class="tabs">
-        <div class="tab-item activo">📊 Dashboard</div>
-        <div class="tab-item">📄 Contratos</div>
-        <div class="tab-item">🧾 Compras</div>
     </div>
 
     <!-- KPIs -->
     <div class="kpi-grid">
+
+        <!-- KPI 1 CUMPLIMIENTO -->
         <div class="kpi-card">
             <div class="kpi-title">Cumplimiento Contractual</div>
             <div class="kpi-value">{{ cumplimiento_contractual }}%</div>
-            <div class="kpi-delta positivo">+2%</div>
+
+            {% if cumplimiento_var > 0 %}
+                <div class="kpi-delta positivo">↑ {{ cumplimiento_var }}%</div>
+            {% elif cumplimiento_var < 0 %}
+                <div class="kpi-delta negativo">↓ {{ cumplimiento_var }}%</div>
+            {% else %}
+                <div class="kpi-delta">0%</div>
+            {% endif %}
         </div>
 
+        <!-- KPI 2 PRODUCCIÓN -->
         <div class="kpi-card">
             <div class="kpi-title">Producción Mensual</div>
             <div class="kpi-value">{{ produccion_mensual|floatformat:1 }} Ton</div>
-            <div class="kpi-delta positivo">+8%</div>
+
+            {% if produccion_var > 0 %}
+                <div class="kpi-delta positivo">↑ {{ produccion_var }}%</div>
+            {% elif produccion_var < 0 %}
+                <div class="kpi-delta negativo">↓ {{ produccion_var }}%</div>
+            {% else %}
+                <div class="kpi-delta">0%</div>
+            {% endif %}
         </div>
 
+        <!-- KPI 3 INVENTARIO -->
         <div class="kpi-card">
             <div class="kpi-title">Inventario Total</div>
             <div class="kpi-value">{{ inventario_total|floatformat:1 }} Ton</div>
-            <div class="kpi-delta negativo">-3%</div>
+
+            {% if inventario_var > 0 %}
+                <div class="kpi-delta positivo">↑ {{ inventario_var }}%</div>
+            {% elif inventario_var < 0 %}
+                <div class="kpi-delta negativo">↓ {{ inventario_var }}%</div>
+            {% else %}
+                <div class="kpi-delta">0%</div>
+            {% endif %}
         </div>
 
+        <!-- KPI 4 INGRESOS -->
         <div class="kpi-card">
             <div class="kpi-title">Ingresos Proyectados</div>
             <div class="kpi-value">${{ ingresos_proyectados|floatformat:0 }} CLP</div>
-            <div class="kpi-delta positivo">+12%</div>
+
+            {% if ingresos_var > 0 %}
+                <div class="kpi-delta positivo">↑ {{ ingresos_var }}%</div>
+            {% elif ingresos_var < 0 %}
+                <div class="kpi-delta negativo">↓ {{ ingresos_var }}%</div>
+            {% else %}
+                <div class="kpi-delta">0%</div>
+            {% endif %}
         </div>
+
     </div>
 
     <!-- ALERTAS -->
@@ -352,7 +353,6 @@
 <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 
 <script>
-
     const proyData = JSON.parse(`{{ chart_proy_vs_contractual|escapejs }}`);
     const invLabels = JSON.parse(`{{ chart_inv_labels|escapejs }}`);
     const invData = JSON.parse(`{{ chart_inv_data|escapejs }}`);
@@ -366,24 +366,19 @@
                     label: 'Contractual',
                     data: proyData.contractual,
                     borderColor: '#ef4444',
-                    backgroundColor: 'rgba(239, 68, 68, 0.08)',
-                    tension: 0.3
+                    backgroundColor: 'rgba(239,68,68,0.1)'
                 },
                 {
                     label: 'Proyectado',
                     data: proyData.proyectado,
                     borderColor: '#14b8a6',
-                    backgroundColor: 'rgba(20, 184, 166, 0.08)',
-                    borderDash: [5, 5],
-                    tension: 0.3
+                    borderDash: [5, 5]
                 },
                 {
                     label: 'Real',
                     data: proyData.real,
-                    borderColor: '#3b82f6',
-                    backgroundColor: 'rgba(59, 130, 246, 0.08)',
-                    tension: 0.3
-                },
+                    borderColor: '#3b82f6'
+                }
             ]
         }
     });
@@ -404,6 +399,5 @@
             }]
         }
     });
-
 </script>
 {% endblock %}

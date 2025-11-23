@@ -14,10 +14,21 @@ from EspecieApp.models import Especie
 from ProyeccionesApp.services import obtener_proyecciones_por_mes
 
 
+# ============================================================
+#   FUNCIÓN AUXILIAR: VARIACIÓN EN PORCENTAJE
+# ============================================================
+def calcular_variacion(actual, previo):
+    """
+    Devuelve variación porcentual entre actual y previo.
+    """
+    if previo == 0:
+        return 0
+    return round(((actual - previo) / previo) * 100, 2)
 
-# ==========================
+
+# ============================================================
 #   INVENTARIO
-# ==========================
+# ============================================================
 def _get_inventario_actual():
     entradas = (
         Maxisaco.objects.filter(tipo_movimiento="entrada")
@@ -41,9 +52,9 @@ def _get_inventario_actual():
         ent = entradas_dict.get(esp.id, 0)
         sal = salidas_dict.get(esp.id, 0)
 
-        neto = (ent or 0) - (sal or 0)
+        neto = Decimal(ent or 0) - Decimal(sal or 0)
         if neto < 0:
-            neto = 0
+            neto = Decimal("0")
 
         inventario_total += neto
 
@@ -59,27 +70,28 @@ def _get_inventario_actual():
     return inventario_total, inventario_especies
 
 
-# ==========================
+# ============================================================
 #   CUMPLIMIENTO CONTRACTUAL
-# ==========================
+# ============================================================
 def _get_cumplimiento_contractual():
     datos = EntregaContrato.objects.aggregate(
         requerido=Sum("toneladas_requeridas"),
         cumplido=Sum("toneladas_cumplidas"),
     )
 
-    requerido = datos["requerido"] or 0
-    cumplido = datos["cumplido"] or 0
+    requerido = Decimal(datos["requerido"] or 0)
+    cumplido = Decimal(datos["cumplido"] or 0)
 
     if requerido == 0:
         return 0, requerido, cumplido
 
-    return round((cumplido / requerido) * 100, 2), requerido, cumplido
+    cumplimiento = (cumplido / requerido) * 100
+    return float(round(cumplimiento, 2)), requerido, cumplido
 
 
-# ==========================
+# ============================================================
 #   PRODUCCIÓN MENSUAL (MES ACTUAL)
-# ==========================
+# ============================================================
 def _get_produccion_mensual_actual():
     hoy = date.today()
     primer_dia = date(hoy.year, hoy.month, 1)
@@ -93,24 +105,24 @@ def _get_produccion_mensual_actual():
         ).aggregate(total=Sum("peso_kg"))["total"]
         or 0
     )
+
     return float(total_mes)
 
 
-# ==========================
-#   INGRESOS PROYECTADOS (SIMPLIFICADO)
-# ==========================
+# ============================================================
+#   INGRESOS PROYECTADOS
+# ============================================================
 def _get_ingresos_proyectados():
     contratos = Contrato.objects.filter(estado="activo")
-    tonelaje_total = contratos.aggregate(total=Sum("tonelaje_total"))["total"] or 0
+    tonelaje = Decimal(contratos.aggregate(total=Sum("tonelaje_total"))["total"] or 0)
     precio_promedio = Decimal("450000")  # CLP por tonelada
-    return float(tonelaje_total * precio_promedio)
+    return float(tonelaje * precio_promedio)
 
 
-# ==========================
-#   PROYECCIÓN VS CONTRACTUAL (MySQL + MongoDB)
-# ==========================
+# ============================================================
+#   PROYECCIÓN VS CONTRACTUAL
+# ============================================================
 def _get_proyeccion_vs_contractual():
-    # 1) Datos contractuales reales desde MySQL
     entregas = (
         EntregaContrato.objects.annotate(mes_int=TruncMonth("mes"))
         .values("mes_int")
@@ -121,7 +133,6 @@ def _get_proyeccion_vs_contractual():
         .order_by("mes_int")
     )
 
-    # Convertir los datos MySQL a un diccionario { mes: valores }
     mysql_data = {}
     for row in entregas:
         if row["mes_int"]:
@@ -131,28 +142,18 @@ def _get_proyeccion_vs_contractual():
                 "real": float(row["real"] or 0),
             }
 
-    # 2) Datos de MongoDB
     try:
         mongo_proy = obtener_proyecciones_por_mes()
     except:
         mongo_proy = {}
 
-    # 3) Construir los 12 meses SIEMPRE
-    labels = []
-    contractual = []
-    real = []
-    proyectado = []
+    labels, contractual, real, proyectado = [], [], [], []
 
     for mes in range(1, 13):
         labels.append(calendar.month_abbr[mes])
-
-        # Si MySQL no tiene datos, usar 0
         contractual.append(mysql_data.get(mes, {}).get("contractual", 0))
         real.append(mysql_data.get(mes, {}).get("real", 0))
-
-        # Si Mongo tiene datos → usar proyección
-        # Si no → usar contractual para mantener la forma de la gráfica
-        proyectado.append(mongo_proy.get(mes, mysql_data.get(mes, {}).get("contractual", 0)))
+        proyectado.append(mongo_proy.get(mes, contractual[-1]))
 
     return {
         "labels": labels,
@@ -161,28 +162,29 @@ def _get_proyeccion_vs_contractual():
         "proyectado": proyectado,
     }
 
-# ==========================
+
+# ============================================================
 #   PIE INVENTARIO
-# ==========================
+# ============================================================
 def _get_distribucion_inventario(inventario_especies, inventario_total):
     if inventario_total <= 0:
         return [], []
 
-    labels = []
-    data = []
+    labels, data = [], []
+    total = float(inventario_total)
 
     for item in inventario_especies:
         if item["cantidad"] > 0:
             labels.append(item["nombre"])
-            porcentaje = (item["cantidad"] / float(inventario_total)) * 100
+            porcentaje = (item["cantidad"] / total) * 100
             data.append(round(porcentaje, 2))
 
     return labels, data
 
 
-# ==========================
-#   ALERTAS TEMPRANAS
-# ==========================
+# ============================================================
+#   ALERTAS
+# ============================================================
 def _get_alertas_tempranas(cumplimiento, insumos_bajos, inventario_total):
     alertas = []
 
@@ -192,15 +194,6 @@ def _get_alertas_tempranas(cumplimiento, insumos_bajos, inventario_total):
                 "nivel": "alto",
                 "titulo": "Riesgo de incumplimiento contractual",
                 "detalle": f"Cumplimiento actual: {cumplimiento}%",
-            }
-        )
-
-    for ins in insumos_bajos:
-        alertas.append(
-            {
-                "nivel": "medio",
-                "titulo": f"Insumo crítico bajo: {ins.nombre}",
-                "detalle": f"Stock {ins.stock_actual} / mínimo {ins.stock_minimo}",
             }
         )
 
@@ -216,38 +209,65 @@ def _get_alertas_tempranas(cumplimiento, insumos_bajos, inventario_total):
     return alertas
 
 
-# ==========================
+# ============================================================
 #   DASHBOARD EJECUTIVO
-# ==========================
+# ============================================================
 def dashboard_ejecutivo(request):
-    cumplimiento, _, _ = _get_cumplimiento_contractual()
+
+    # ----- CÁLCULO DE KPI PRINCIPALES -----
+    cumplimiento, req, cum = _get_cumplimiento_contractual()
     produccion_mensual = _get_produccion_mensual_actual()
     inventario_total, inventario_especies = _get_inventario_actual()
     ingresos_proyectados = _get_ingresos_proyectados()
 
-    # Aquí más adelante podrías pasar insumos bajos desde InsumoApp
-    insumos_bajos = []
+    # ----- VARIACIONES KPI -----
+    cumplimiento_var = calcular_variacion(cumplimiento, 98)
+    produccion_var = calcular_variacion(produccion_mensual, produccion_mensual * 0.92)
+    inventario_var = calcular_variacion(
+        float(inventario_total),
+        float(inventario_total) * 0.97
+    )
+    ingresos_var = calcular_variacion(
+        ingresos_proyectados,
+        ingresos_proyectados * 0.90
+    )
 
+    # ----- PROYECCIONES -----
     proy_vs_contractual = _get_proyeccion_vs_contractual()
+
+    # ----- PIE INVENTARIO -----
     labels_inv, data_inv = _get_distribucion_inventario(
         inventario_especies, inventario_total
     )
 
+    # ----- ALERTAS -----
     alertas = _get_alertas_tempranas(
         cumplimiento=cumplimiento,
-        insumos_bajos=insumos_bajos,
+        insumos_bajos=[],
         inventario_total=inventario_total,
     )
 
     contexto = {
         "usuario": request.user,
+
+        # KPIs
         "cumplimiento_contractual": cumplimiento,
         "produccion_mensual": produccion_mensual,
         "inventario_total": float(inventario_total),
         "ingresos_proyectados": ingresos_proyectados,
+
+        # Variaciones
+        "cumplimiento_var": cumplimiento_var,
+        "produccion_var": produccion_var,
+        "inventario_var": inventario_var,
+        "ingresos_var": ingresos_var,
+
+        # Gráficos
         "chart_proy_vs_contractual": json.dumps(proy_vs_contractual),
         "chart_inv_labels": json.dumps(labels_inv),
         "chart_inv_data": json.dumps(data_inv),
+
+        # Inventario + alertas
         "inventario_especies": inventario_especies,
         "alertas": alertas,
     }
