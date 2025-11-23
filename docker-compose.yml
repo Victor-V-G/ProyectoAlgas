@@ -1,0 +1,57 @@
+services:
+
+  mysql:
+    image: mysql:8.0
+    container_name: mysql_algas
+    restart: always
+    environment:
+      MYSQL_ROOT_PASSWORD: root
+      MYSQL_DATABASE: proyecto-algas-db
+    ports:
+      - "3307:3306"   # 🔥 Puerto cambiado para evitar conflicto con tu MySQL local
+    volumes:
+      - mysql_data:/var/lib/mysql
+
+  mongo:
+    image: mongo:6
+    container_name: mongo_algas
+    restart: always
+    ports:
+      - "27017:27017"
+    volumes:
+      - mongo_data:/data/db
+
+  django:
+    build: .
+    container_name: django_algas
+    restart: always
+    command: >
+      sh -c "python manage.py makemigrations &&
+             python manage.py migrate &&
+             python manage.py runserver 0.0.0.0:8000"
+    volumes:
+      - .:/app
+    environment:
+      DB_HOST: mysql
+      DB_NAME: proyecto-algas-db
+      DB_USER: root
+      DB_PASSWORD: root
+      MONGO_URI: mongodb://mongo:27017/
+    ports:
+      - "8000:8000"
+    depends_on:
+      - mysql
+      - mongo
+
+  microservicio:
+    build: ./microservicio_proyecciones
+    container_name: microservicio_algas
+    restart: always
+    ports:
+      - "8001:8001"
+    depends_on:
+      - mongo
+
+volumes:
+  mysql_data:
+  mongo_data:

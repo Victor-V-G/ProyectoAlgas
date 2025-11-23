@@ -1,0 +1,9 @@
+django
+pymysql
+pymongo
+requests
+fastapi
+uvicorn
+python-dotenv
+pydantic
+cryptography

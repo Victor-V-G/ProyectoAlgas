@@ -1,3 +1,16 @@
+
+
+
+
+INICIAR PROYECTO CON DOCKER, TENER INSTALADO PRIMERO DOCKER.EXE https://www.docker.com/products/docker-desktop/
+UNA VEZ INSTALADO ACCEDER A LA CARPETA EN CMD PROYECTOALGAS, Y EJECUTAR EL COMANDO: docker compose up --build
+Y VER EN LA APP DE DOCKER EN CONTAINERS, ACCEDER AL PROYECTO Y ABRIR LA URL DE DJANGO Y LISTO
+SIN NECESIDAD DE INSTALAR MONGODB, NI MYSQL WORKBENCH
+
+
+
+
+
 DOCUMENTACIÓN DE INICIO DEL PROYECTO - Sistema de Gestión de Algas
 
 Requisitos, instalación, configuración y ejecución detallada del backend Django, MySQL, MongoDB y microservicio FastAPI.
