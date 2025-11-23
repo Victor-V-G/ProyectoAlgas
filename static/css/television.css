@@ -1,0 +1,187 @@
+.page-wrapper {
+    display: flex;
+    flex-direction: column;
+    gap: 1.5rem;
+}
+
+.top-bar {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+.top-bar-left h1 {
+    margin: 0;
+    font-size: 1.4rem;
+}
+
+.top-bar-left span {
+    font-size: 0.9rem;
+    color: #6b7280;
+}
+
+.top-bar-right {
+    text-align: right;
+    font-size: 0.9rem;
+    color: #4b5563;
+}
+
+.kpi-grid {
+    display: grid;
+    grid-template-columns: repeat(4, minmax(0, 1fr));
+    gap: 1rem;
+}
+
+.kpi-card {
+    background: #ffffff;
+    border-radius: 12px;
+    padding: 1rem 1.25rem;
+    box-shadow: 0 1px 3px rgba(15, 23, 42, 0.08);
+    border: 1px solid #e5e7eb;
+}
+
+.kpi-title {
+    font-size: 0.9rem;
+    color: #6b7280;
+    margin-bottom: 0.4rem;
+}
+
+.kpi-value {
+    font-size: 1.4rem;
+    font-weight: 600;
+    margin-bottom: 0.2rem;
+    color: #111827;
+}
+
+.kpi-delta {
+    font-size: 0.85rem;
+    font-weight: 600;
+}
+
+.positivo {
+    color: #16a34a;
+}
+
+.negativo {
+    color: #dc2626;
+}
+
+.section-card {
+    background: #ffffff;
+    border-radius: 14px;
+    padding: 1.25rem 1.5rem;
+    box-shadow: 0 1px 3px rgba(15, 23, 42, 0.08);
+    border: 1px solid #e5e7eb;
+}
+
+.section-header {
+    font-weight: 600;
+    margin-bottom: 0.75rem;
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    color: #111827;
+}
+
+.alerts-list {
+    display: flex;
+    flex-direction: column;
+    gap: 0.6rem;
+}
+
+.alert-item {
+    border-radius: 10px;
+    padding: 0.8rem 1rem;
+    border-left-width: 4px;
+    background: #f9fafb;
+}
+
+.alert-alto {
+    border-left-color: #ef4444;
+    background: #fef2f2;
+}
+
+.alert-medio {
+    border-left-color: #f97316;
+    background: #fffbeb;
+}
+
+.alert-bajo {
+    border-left-color: #3b82f6;
+    background: #eff6ff;
+}
+
+.alert-title {
+    font-weight: 600;
+    margin-bottom: 0.2rem;
+    font-size: 0.95rem;
+}
+
+.alert-detail {
+    font-size: 0.85rem;
+    color: #4b5563;
+}
+
+.grid-2 {
+    display: grid;
+    grid-template-columns: 2fr 1.3fr;
+    gap: 1rem;
+}
+
+.inventario-tabla table {
+    width: 100%;
+    border-collapse: collapse;
+    font-size: 0.9rem;
+}
+
+.inventario-tabla th,
+.inventario-tabla td {
+    padding: 0.6rem 0.5rem;
+    border-bottom: 1px solid #e5e7eb;
+    text-align: left;
+}
+
+.inventario-tabla th {
+    font-weight: 600;
+    color: #6b7280;
+}
+
+.badge-estado {
+    display: inline-flex;
+    align-items: center;
+    padding: 0.15rem 0.6rem;
+    border-radius: 999px;
+    font-size: 0.75rem;
+}
+
+.badge-normal {
+    background: #ecfdf3;
+    color: #16a34a;
+}
+
+.badge-bajo {
+    background: #fef3c7;
+    color: #d97706;
+}
+
+.tabs {
+    display: flex;
+    gap: 1.5rem;
+    margin-top: 1rem;
+    margin-bottom: 1.5rem;
+    border-bottom: 1px solid #e5e7eb;
+}
+
+.tab-item {
+    padding-bottom: 0.6rem;
+    font-size: 0.9rem;
+    cursor: pointer;
+    color: #6b7280;
+    border-bottom: 2px solid transparent;
+}
+
+.tab-item.activo {
+    color: #0f766e;
+    border-bottom-color: #0f766e;
+    font-weight: 600;
+}

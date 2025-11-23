@@ -1,0 +1,258 @@
+DOCUMENTACIÓN COMPLETA DEL SISTEMA DE GESTIÓN DE ALGAS
+========================================================
+
+1. VISIÓN GENERAL DEL SISTEMA
+--------------------------------------------------------
+El sistema es una plataforma integral para gestionar las operaciones 
+de una empresa productora de algas. Implementa funcionalidades de:
+
+• Gestión de usuarios y roles con permisos.
+• Control de stock productivo (Maxisacos).
+• Gestión de insumos y stock mínimo.
+• Gestión de especies de algas.
+• Administración de contratos y entregas mensuales.
+• Dashboard ejecutivo con KPIs, gráficos y alertas.
+• Integración con microservicio FastAPI para proyecciones.
+• Uso de MongoDB para almacenar predicciones.
+• Auditoría de acciones críticas.
+• Autenticación con modelo personalizado y sesiones de Django.
+
+Tecnologías principales:
+- Django 5 (backend web)
+- MySQL (base relacional)
+- MongoDB (proyecciones)
+- FastAPI (microservicio predictivo)
+- Sessions + RBAC (control de acceso)
+- Django templates + CSS global
+
+--------------------------------------------------------
+
+2. ARQUITECTURA DEL SISTEMA POR APLICACIONES (APPS)
+--------------------------------------------------------
+El proyecto se organiza modularmente:
+
+UsuariosApp .......... Usuarios y datos iniciales
+RolApp ............... Definición de roles y permisos
+LoginApp ............. Sistema de login/logout
+HomeApp .............. Dashboard ejecutivo
+StockApp ............. Gestión de producción (Maxisacos)
+InsumoApp ............ Gestión de insumos
+EspecieApp ........... Gestión de especies de algas
+ContratoApp .......... Contratos y entregas mensuales
+AuditoriaApp ......... Auditoría de acciones
+ProyeccionesApp ...... Integración con microservicio de IA
+
+Microservicio externo:
+- FastAPI encargado de proyectar toneladas futuras.
+
+--------------------------------------------------------
+
+3. GESTIÓN DE USUARIOS Y ROLES
+--------------------------------------------------------
+
+3.1 Modelo Rol
+Define permisos clave:
+• PermisoVerDashboard
+• PermisoEditarStock
+• PermisoCrearContratos
+
+Roles iniciales:
+- RolAdmin
+- Gerente
+- EncargadoStock
+- Operario
+
+3.2 Modelo Usuarios
+Contiene:
+• Username, Email, Rut → todos únicos
+• Contraseña encriptada con make_password
+• Rol asignado (FK)
+• FechaCreacion y estado
+
+3.3 Creación automática de roles y usuarios
+Vía post_migrate se asegura que existan datos base:
+- Admin
+- gerente
+- stock
+- operario
+
+--------------------------------------------------------
+
+4. SEGURIDAD: PERMISOS Y AUDITORÍA
+--------------------------------------------------------
+
+4.1 Decorador requiere_permiso
+Garantiza:
+• Que el usuario esté logeado.
+• Que exista rol asignado.
+• Que posea el permiso correspondiente.
+• Redirección automática según rol.
+• Mensaje de error si no tiene autorización.
+
+4.2 Decorador auditar
+Características:
+• Registra solo POST con redirect (éxito real).
+• Guarda: usuario, acción, módulo, detalle, fecha.
+
+Modelo Auditoria:
+- usuario
+- accion
+- modulo
+- detalle
+- fecha
+
+--------------------------------------------------------
+
+5. MÓDULOS FUNCIONALES (CRUDs COMPLETOS)
+--------------------------------------------------------
+
+5.1 STOCK – Maxisacos
+Modelo:
+• especie
+• peso_kg
+• tipo_movimiento (entrada/salida)
+• registrado_por / actualizado_por
+• fecha_registro / fecha_actualizacion
+
+Vistas:
+✔ listar
+✔ crear
+✔ editar
+✔ eliminar
+✔ detalle
+
+Todo protegido con PermisoEditarStock.
+
+5.2 INSUMOS
+Modelo:
+- cantidad
+- unidad
+- minimo_seguridad
+- creado_por / actualizado_por
+
+estado_stock():
+• sin_stock
+• bajo
+• normal
+
+CRUD completo + auditoría.
+
+5.3 ESPECIES
+Modelo:
+- nombre
+- descripcion
+- proporcion_conversion
+
+CRUD completo + auditoría.
+
+5.4 CONTRATOS
+Modelo Contrato:
+• cliente
+• tonelaje_total
+• fecha_inicio/fin
+• creado_por / actualizado_por
+• estado
+
+Modelo EntregaContrato:
+• mes
+• toneladas_requeridas / cumplidas
+
+CRUD + entregas mensuales + auditoría.
+
+--------------------------------------------------------
+
+6. DASHBOARD EJECUTIVO
+--------------------------------------------------------
+KPIs:
+• Cumplimiento contractual
+• Producción mensual
+• Inventario total
+• Ingresos proyectados
+
+Funciones de cálculo:
+- _get_inventario_actual
+- _get_cumplimiento_contractual
+- _get_produccion_mensual_actual
+- _get_ingresos_proyectados
+- _get_proyeccion_vs_contractual
+- _get_distribucion_inventario
+- _get_alertas_tempranas
+
+Usa Chart.js para gráficos.
+
+--------------------------------------------------------
+
+7. MICRO SERVICIO Y MONGODB
+--------------------------------------------------------
+
+7.1 FastAPI
+Endpoint: /api/proyectar
+Funcionamiento:
+• Calcula promedio histórico.
+• Aplica tendencia +5%.
+• Genera meses proyectados.
+
+7.2 Cliente en Django
+llamar_microservicio_proyecciones():
+• Hace POST con species + histórico.
+• Recibe lista de proyecciones.
+
+7.3 Servicio de Django
+generar_proyecciones_automaticas():
+• Obtiene histórico de MySQL.
+• Llama al microservicio.
+• Guarda proyecciones en MongoDB.
+• Actualiza o crea documentos.
+
+--------------------------------------------------------
+
+8. PLANTILLAS Y ESTILOS
+--------------------------------------------------------
+• base.html centraliza navegación.
+• Sistema visual coherente con CSS global.
+• Login estilizado.
+• Tablas uniformes para listas.
+• Formularios estilizados con clases globales.
+
+--------------------------------------------------------
+
+9. CONFIGURACIÓN DEL ENTORNO
+--------------------------------------------------------
+settings.py contiene:
+
+Base de datos MySQL:
+- ENGINE, NAME, USER, PASSWORD
+
+MongoDB:
+- MONGO_URI
+- MONGO_DB_NAME
+- MONGO_COLLECTION_PROYECCIONES
+
+Microservicio:
+- PROYECCIONES_MICRO_URL
+
+Static:
+- STATIC_URL
+- STATICFILES_DIRS
+
+--------------------------------------------------------
+
+10. RESUMEN FINAL DE CAPACIDADES
+--------------------------------------------------------
+El sistema implementa:
+
+✓ RBAC completo (Role-Based Access Control)
+✓ Auditoría integral de operaciones sensibles
+✓ CRUDs completos y trazables
+✓ Dashboard analítico avanzado
+✓ Microservicio predictivo de producción
+✓ Integración MySQL + MongoDB
+✓ Arquitectura modular y mantenible
+✓ Estilo visual uniforme y responsivo
+✓ Seguridad con contraseñas encriptadas
+✓ Estructura alineada al paradigma 4+1
+✓ Casos de uso cubiertos completamente
+
+========================================================
+FIN DE LA DOCUMENTACIÓN
+========================================================

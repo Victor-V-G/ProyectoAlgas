@@ -1,89 +1,58 @@
 <!DOCTYPE html>
+{% load static %}
 <html lang="es">
+
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <!--
+        ============================================================
+        TÍTULO DE LA PÁGINA
+        - Se permite sobrescribirlo desde otras plantillas con block title
+        ============================================================
+    -->
     <title>{% block title %}Sistema de Gestión{% endblock %}</title>
 
-    <!-- Estilos globales -->
-    <style>
-        body {
-            margin: 0;
-            padding: 0;
-            font-family: Arial, sans-serif;
-            background: #f4f6f9;
-        }
+    <!--
+        ============================================================
+        ARCHIVOS CSS GLOBALES
+        - base-style.css → estilos generales de la aplicación
+        - television.css → estilos adicionales específicos
+        ============================================================
+    -->
+    <link rel="stylesheet" href="{% static 'css/base-style.css' %}">
+    <link rel="stylesheet" href="{% static 'css/television.css' %}">
 
-        /* NAVBAR */
-        .navbar {
-            background: #0f766e;
-            color: white;
-            padding: 15px 25px;
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
-        }
-
-        .navbar a {
-            color: white;
-            margin-left: 15px;
-            text-decoration: none;
-            font-weight: bold;
-        }
-
-        .navbar a:hover {
-            text-decoration: underline;
-        }
-
-        /* CONTENEDOR PRINCIPAL */
-        .container {
-            width: 90%;
-            max-width: 1200px;
-            margin: 30px auto;
-            background: white;
-            padding: 25px;
-            border-radius: 10px;
-            box-shadow: 0 4px 15px rgba(0,0,0,0.1);
-        }
-
-        /* MENSAJES */
-        .msg-success {
-            background: #d4edda;
-            padding: 10px;
-            border-left: 6px solid #28a745;
-            margin-bottom: 15px;
-            border-radius: 4px;
-        }
-
-        .msg-error {
-            background: #f8d7da;
-            padding: 10px;
-            border-left: 6px solid #dc3545;
-            margin-bottom: 15px;
-            border-radius: 4px;
-        }
-
-        .msg-warning {
-            background: #fff3cd;
-            padding: 10px;
-            border-left: 6px solid #ffc107;
-            margin-bottom: 15px;
-            border-radius: 4px;
-        }
-    </style>
-
+    <!--
+        ============================================================
+        BLOQUE OPCIONAL PARA INYECTAR CSS EN PÁGINAS HIJAS
+        ============================================================
+    -->
     {% block extra_css %}{% endblock %}
 </head>
+
+
 <body>
 
-    <!-- NAVBAR -->
+    <!-- ============================================================
+         NAVBAR PRINCIPAL DEL SISTEMA
+         - Muestra el nombre del sistema
+         - Navegación entre módulos
+         ============================================================ -->
     <div class="navbar">
+
+        <!-- Título o nombre del sistema -->
         <div>
             <strong>Sistema de Gestión de Algas</strong>
         </div>
 
+        <!-- Enlaces de navegación -->
         <div>
+            <!--
+                Cada enlace usa para redirigir a su view correspondiente.
+                Asegúrate de que los nombres (name="...") en urls.py coincidan.
+            -->
             <a href="{% url 'dashboard' %}">Inicio</a>
             <a href="{% url 'contratos' %}">Contratos</a>
             <a href="{% url 'especies' %}">Especies de Algas</a>
@@ -91,14 +60,26 @@
             <a href="{% url 'insumos' %}">Insumos</a>
             <a href="{% url 'auditoria' %}">Auditorias</a>
 
+            <!-- Cerrar sesión -->
             <a href="{% url 'logout' %}">Cerrar sesión</a>
         </div>
     </div>
 
-    <!-- CONTENIDO -->
+
+
+    <!-- ============================================================
+         CONTENEDOR PRINCIPAL DEL CONTENIDO
+         Aquí se mostrará cada vista que extienda esta plantilla.
+         ============================================================ -->
     <div class="container">
 
-        <!-- Mensajes de Django -->
+        <!--
+            ============================================================
+            MENSAJES DE DJANGO
+            - Muestra mensajes generados por messages.success/warning/error
+            - message.tags permite aplicar estilos según tipo
+            ============================================================
+        -->
         {% if messages %}
             {% for message in messages %}
                 <div class="msg-{{ message.tags }}">
@@ -107,12 +88,26 @@
             {% endfor %}
         {% endif %}
 
+        <!--
+            ============================================================
+            BLOQUE PRINCIPAL DE CONTENIDO
+            Cada vista lo sobrescribe con su propio HTML.
+            ============================================================
+        -->
         {% block content %}
         {% endblock %}
 
     </div>
 
+
+    <!--
+        ============================================================
+        BLOQUE PARA INYECTAR SCRIPTS (JS) ESPECÍFICOS DE CADA VISTA
+        - Útil para gráficos, AJAX, validaciones, etc.
+        ============================================================
+    -->
     {% block extra_js %}{% endblock %}
 
 </body>
+
 </html>

@@ -1,0 +1,73 @@
+DOCUMENTACIÓN DE INICIO DEL PROYECTO - Sistema de Gestión de Algas
+
+Requisitos, instalación, configuración y ejecución detallada del backend Django, MySQL, MongoDB y microservicio FastAPI.
+
+puede probar iniciando el script llamado reset_full_system.py, este realizara todo automatico
+
+NECESITAR INSTALADO MONGODB CON COMPASS INICIALIZADO, JUNTO A MYSQL WORKBENCH CON CONEXION INICIADA
+
+------------------------------------------------------------
+📘 DOCUMENTACIÓN DE INICIO DEL PROYECTO
+Sistema de Gestión de Algas — Django + MySQL + MongoDB + FastAPI
+------------------------------------------------------------
+
+1. Requisitos previos del sistema
+- Python 3.10 o superior
+- pip
+- MySQL Server 8
+- MongoDB Community Server
+- FastAPI + Uvicorn
+
+2. Instalación de dependencias globales
+pip install django pymysql mysqlclient pymongo requests fastapi uvicorn
+pip install python-dotenv pydantic
+
+3. Configuración MySQL
+CREATE DATABASE `proyecto-algas-db` CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;
+
+settings.py:
+DATABASES = {
+    'default': {
+        'ENGINE': 'django.db.backends.mysql',
+        'NAME': 'proyecto-algas-db',
+        'USER': 'root',
+        'PASSWORD': 'root'
+    }
+}
+
+4. Configuración MongoDB
+MONGO_URI = "mongodb://localhost:27017/"
+MONGO_DB_NAME = "proyecto_algas_db"
+MONGO_COLLECTION_PROYECCIONES = "proyecciones"
+
+5. Migraciones y datos iniciales
+python manage.py makemigrations
+python manage.py migrate
+
+Roles creados:
+- RolAdmin, Gerente, EncargadoStock, Operario
+
+Usuarios creados:
+- Admin / Admin123
+- gerente / Gerente123
+- stock / Stock123
+- operario / Operario123
+
+6. Ejecutar Django
+python manage.py runserver
+http://127.0.0.1:8000/
+
+7. Ejecutar microservicio FastAPI
+uvicorn main:app --reload --port 8001
+http://127.0.0.1:8001/api/proyectar
+
+8. Generar proyecciones
+http://127.0.0.1:8000/proyecciones/actualizar/
+
+9. Flujo completo
+- Iniciar MySQL
+- Iniciar MongoDB
+- instalar dependencias
+- migrate
+- runserver
+- uvicorn main:app

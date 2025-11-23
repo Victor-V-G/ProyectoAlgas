@@ -1,209 +1,34 @@
 {% extends "base.html" %}
 
+<!--
+============================================================
+TÍTULO PERSONALIZADO DE LA PÁGINA
+============================================================
+-->
 {% block title %}Dashboard Ejecutivo{% endblock %}
 
 {% block extra_css %}
-<style>
-    .page-wrapper {
-        display: flex;
-        flex-direction: column;
-        gap: 1.5rem;
-    }
-
-    .top-bar {
-        display: flex;
-        justify-content: space-between;
-        align-items: center;
-    }
-
-    .top-bar-left h1 {
-        margin: 0;
-        font-size: 1.4rem;
-    }
-
-    .top-bar-left span {
-        font-size: 0.9rem;
-        color: #6b7280;
-    }
-
-    .top-bar-right {
-        text-align: right;
-        font-size: 0.9rem;
-        color: #4b5563;
-    }
-
-    .kpi-grid {
-        display: grid;
-        grid-template-columns: repeat(4, minmax(0, 1fr));
-        gap: 1rem;
-    }
-
-    .kpi-card {
-        background: #ffffff;
-        border-radius: 12px;
-        padding: 1rem 1.25rem;
-        box-shadow: 0 1px 3px rgba(15, 23, 42, 0.08);
-        border: 1px solid #e5e7eb;
-    }
-
-    .kpi-title {
-        font-size: 0.9rem;
-        color: #6b7280;
-        margin-bottom: 0.4rem;
-    }
-
-    .kpi-value {
-        font-size: 1.4rem;
-        font-weight: 600;
-        margin-bottom: 0.2rem;
-        color: #111827;
-    }
-
-    .kpi-delta {
-        font-size: 0.85rem;
-        font-weight: 600;
-    }
-
-    .positivo {
-        color: #16a34a;
-    }
-
-    .negativo {
-        color: #dc2626;
-    }
-
-    .section-card {
-        background: #ffffff;
-        border-radius: 14px;
-        padding: 1.25rem 1.5rem;
-        box-shadow: 0 1px 3px rgba(15, 23, 42, 0.08);
-        border: 1px solid #e5e7eb;
-    }
-
-    .section-header {
-        font-weight: 600;
-        margin-bottom: 0.75rem;
-        display: flex;
-        align-items: center;
-        gap: 0.5rem;
-        color: #111827;
-    }
-
-    .alerts-list {
-        display: flex;
-        flex-direction: column;
-        gap: 0.6rem;
-    }
-
-    .alert-item {
-        border-radius: 10px;
-        padding: 0.8rem 1rem;
-        border-left-width: 4px;
-        background: #f9fafb;
-    }
-
-    .alert-alto {
-        border-left-color: #ef4444;
-        background: #fef2f2;
-    }
-
-    .alert-medio {
-        border-left-color: #f97316;
-        background: #fffbeb;
-    }
-
-    .alert-bajo {
-        border-left-color: #3b82f6;
-        background: #eff6ff;
-    }
-
-    .alert-title {
-        font-weight: 600;
-        margin-bottom: 0.2rem;
-        font-size: 0.95rem;
-    }
-
-    .alert-detail {
-        font-size: 0.85rem;
-        color: #4b5563;
-    }
-
-    .grid-2 {
-        display: grid;
-        grid-template-columns: 2fr 1.3fr;
-        gap: 1rem;
-    }
-
-    .inventario-tabla table {
-        width: 100%;
-        border-collapse: collapse;
-        font-size: 0.9rem;
-    }
-
-    .inventario-tabla th,
-    .inventario-tabla td {
-        padding: 0.6rem 0.5rem;
-        border-bottom: 1px solid #e5e7eb;
-        text-align: left;
-    }
-
-    .inventario-tabla th {
-        font-weight: 600;
-        color: #6b7280;
-    }
-
-    .badge-estado {
-        display: inline-flex;
-        align-items: center;
-        padding: 0.15rem 0.6rem;
-        border-radius: 999px;
-        font-size: 0.75rem;
-    }
-
-    .badge-normal {
-        background: #ecfdf3;
-        color: #16a34a;
-    }
-
-    .badge-bajo {
-        background: #fef3c7;
-        color: #d97706;
-    }
-
-    .tabs {
-        display: flex;
-        gap: 1.5rem;
-        margin-top: 1rem;
-        margin-bottom: 1.5rem;
-        border-bottom: 1px solid #e5e7eb;
-    }
-
-    .tab-item {
-        padding-bottom: 0.6rem;
-        font-size: 0.9rem;
-        cursor: pointer;
-        color: #6b7280;
-        border-bottom: 2px solid transparent;
-    }
-
-    .tab-item.activo {
-        color: #0f766e;
-        border-bottom-color: #0f766e;
-        font-weight: 600;
-    }
-</style>
+<!-- Espacio opcional para CSS adicional de esta página -->
 {% endblock %}
+
 
 {% block content %}
 <div class="page-wrapper">
 
-    <!-- ENCABEZADO -->
+    <!-- ========================================================
+         ENCABEZADO SUPERIOR (Top Bar)
+         - Muestra el título del dashboard
+         - Botón para recalcular proyecciones en tiempo real
+       ======================================================== -->
     <div class="top-bar">
+
+        <!-- TÍTULO Y SUBTÍTULO -->
         <div class="top-bar-left">
             <h1>Dashboard Ejecutivo</h1>
             <span>Sistema de Gestión de Algas</span>
         </div>
 
+        <!-- BOTÓN PARA ACTUALIZAR PROYECCIONES -->
         <div class="top-bar-right">
             <a href="{% url 'proyecciones_actualizar' %}"
                style="padding: 7px 12px; background:#0f766e; color:white;
@@ -214,10 +39,16 @@
         </div>
     </div>
 
-    <!-- KPIs -->
+
+
+    <!-- ========================================================
+         SECCIÓN PRINCIPAL DE KPIs (Indicadores)
+         - Cada tarjeta muestra un valor + variación %
+         - Los datos se envían desde la view
+       ======================================================== -->
     <div class="kpi-grid">
 
-        <!-- KPI 1 CUMPLIMIENTO -->
+        <!-- KPI 1: Cumplimiento Contractual -->
         <div class="kpi-card">
             <div class="kpi-title">Cumplimiento Contractual</div>
             <div class="kpi-value">{{ cumplimiento_contractual }}%</div>
@@ -231,7 +62,7 @@
             {% endif %}
         </div>
 
-        <!-- KPI 2 PRODUCCIÓN -->
+        <!-- KPI 2: Producción Mensual -->
         <div class="kpi-card">
             <div class="kpi-title">Producción Mensual</div>
             <div class="kpi-value">{{ produccion_mensual|floatformat:1 }} Ton</div>
@@ -245,7 +76,7 @@
             {% endif %}
         </div>
 
-        <!-- KPI 3 INVENTARIO -->
+        <!-- KPI 3: Inventario Total -->
         <div class="kpi-card">
             <div class="kpi-title">Inventario Total</div>
             <div class="kpi-value">{{ inventario_total|floatformat:1 }} Ton</div>
@@ -259,7 +90,7 @@
             {% endif %}
         </div>
 
-        <!-- KPI 4 INGRESOS -->
+        <!-- KPI 4: Ingresos Proyectados -->
         <div class="kpi-card">
             <div class="kpi-title">Ingresos Proyectados</div>
             <div class="kpi-value">${{ ingresos_proyectados|floatformat:0 }} CLP</div>
@@ -275,11 +106,18 @@
 
     </div>
 
-    <!-- ALERTAS -->
+
+
+    <!-- ========================================================
+         SECCIÓN DE ALERTAS TEMPRANAS
+         - alertas → lista de objetos con título, detalle y nivel
+         - Se muestran tarjetas dependiendo del nivel crítico
+       ======================================================== -->
     <div class="section-card">
         <div class="section-header">⚠ Alertas Tempranas</div>
 
         <div class="alerts-list">
+
             {% if alertas %}
                 {% for a in alertas %}
                     <div class="alert-item alert-{{ a.nivel }}">
@@ -288,28 +126,47 @@
                     </div>
                 {% endfor %}
             {% else %}
+                <!-- Mensaje si no existen alertas -->
                 <div class="alert-item">
                     <div class="alert-title">Sin alertas críticas por el momento</div>
                     <div class="alert-detail">El sistema no detecta riesgos inmediatos.</div>
                 </div>
             {% endif %}
+
         </div>
     </div>
 
-    <!-- GRÁFICOS -->
+
+
+    <!-- ========================================================
+         SECCIÓN DE GRÁFICOS (Chart.js)
+         - Gráfico 1: Proyección mensual vs contractual
+         - Gráfico 2: Distribución del inventario
+         - Los datos vienen serializados desde la view
+       ======================================================== -->
     <div class="grid-2">
+
+        <!-- GRÁFICO DE PROYECCIÓN -->
         <div class="section-card">
             <div class="section-header">📅 Proyección Mensual vs Contractual</div>
             <canvas id="chartProyeccion" height="120"></canvas>
         </div>
 
+        <!-- GRÁFICO DE INVENTARIO -->
         <div class="section-card">
             <div class="section-header">📦 Distribución de Inventario</div>
             <canvas id="chartInventario" height="120"></canvas>
         </div>
+
     </div>
 
-    <!-- INVENTARIO -->
+
+
+    <!-- ========================================================
+         TABLA DE INVENTARIO AGRUPADO POR ESPECIES
+         - Muestra stock actual por especie
+         - Control de estado (normal / sin stock)
+       ======================================================== -->
     <div class="section-card inventario-tabla">
         <div class="section-header">📊 Inventario Actual</div>
 
@@ -337,7 +194,9 @@
                         {% endif %}
                     </td>
                 </tr>
+
                 {% empty %}
+                <!-- Si no hay inventario disponible -->
                 <tr>
                     <td colspan="4">No hay datos de inventario registrados.</td>
                 </tr>
@@ -349,14 +208,28 @@
 </div>
 {% endblock %}
 
+
+
+<!-- ============================================================
+     BLOQUE PARA SCRIPTS ESPECÍFICOS DEL DASHBOARD
+     - Carga Chart.js
+     - Genera los gráficos usando datos serializados desde Django
+   ============================================================ -->
 {% block extra_js %}
 <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 
 <script>
+    /* ------------------------------------------------------------
+       DATOS RECIBIDOS DESDE DJANGO EN FORMATO JSON
+       Se escapan con escapejs para evitar errores de sintaxis.
+    ------------------------------------------------------------ */
     const proyData = JSON.parse(`{{ chart_proy_vs_contractual|escapejs }}`);
     const invLabels = JSON.parse(`{{ chart_inv_labels|escapejs }}`);
     const invData = JSON.parse(`{{ chart_inv_data|escapejs }}`);
 
+    /* ------------------------------------------------------------
+       GRÁFICO 1: LÍNEA - Proyección vs Contractual vs Real
+    ------------------------------------------------------------ */
     new Chart(document.getElementById('chartProyeccion'), {
         type: 'line',
         data: {
@@ -383,6 +256,9 @@
         }
     });
 
+    /* ------------------------------------------------------------
+       GRÁFICO 2: PIE - Distribución del inventario
+    ------------------------------------------------------------ */
     new Chart(document.getElementById('chartInventario'), {
         type: 'pie',
         data: {
