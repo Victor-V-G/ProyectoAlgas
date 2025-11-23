@@ -212,6 +212,9 @@ def _get_alertas_tempranas(cumplimiento, insumos_bajos, inventario_total):
 # ============================================================
 #   DASHBOARD EJECUTIVO
 # ============================================================
+from RolApp.decorators import requiere_permiso
+
+@requiere_permiso("PermisoVerDashboard")
 def dashboard_ejecutivo(request):
 
     # ----- CÁLCULO DE KPI PRINCIPALES -----

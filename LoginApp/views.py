@@ -16,25 +16,46 @@ def RenderLoginForm(request):
         UsernameField = request.POST['UsernameField']
         PasswordField = request.POST['PasswordField']
 
-        if not UsuariosModels.objects.filter(Username=UsernameField):
-            messages.error(request, "Contraseña o identificador de usuario incorrectos. Escriba la contraseña y el identificador de usuario correctos e inténtelo de nuevo.")
+        # ---------- VALIDACIÓN DEL USUARIO ----------
+        if not UsuariosModels.objects.filter(Username=UsernameField).exists():
+            messages.error(request, "Credenciales incorrectas.")
             return render(request, 'LoginTemplate/Form.html', data)
-        else:
-            UsuarioRecuperado = UsuariosModels.objects.get(Username=UsernameField)
-            if check_password(PasswordField, UsuarioRecuperado.Password):
-                request.session['Usuario_Ingresado'] = UsuarioRecuperado.Username
 
-                UsuarioLogeado = request.session.get('Usuario_Ingresado')
-                
-                if UsuarioLogeado == 'Admin':
-                    return redirect('dashboard')
-                else:
-                    pass
+        UsuarioRecuperado = UsuariosModels.objects.get(Username=UsernameField)
 
-            else:
-                messages.error(request, "Contraseña o identificador de usuario incorrectos. Escriba la contraseña y el identificador de usuario correctos e inténtelo de nuevo.")
+        if not check_password(PasswordField, UsuarioRecuperado.Password):
+            messages.error(request, "Credenciales incorrectas.")
+            return render(request, 'LoginTemplate/Form.html', data)
+
+        # ---------- LOGIN EXITOSO ----------
+        request.session['Usuario_Ingresado'] = UsuarioRecuperado.Username
+        request.session['Usuario_RolId'] = UsuarioRecuperado.Rol.RolId
+        request.session['Usuario_RolNombre'] = UsuarioRecuperado.Rol.NombreRol
+
+        rol = UsuarioRecuperado.Rol
+
+        # ============================================================
+        #   REDIRECCIÓN AUTOMÁTICA SEGÚN EL NOMBRE DEL ROL (TU VERSIÓN)
+        # ============================================================
+
+        if rol.NombreRol == "RolAdmin":
+            return redirect("dashboard")
+
+        elif rol.NombreRol == "Gerente":
+            return redirect("dashboard")
+
+        elif rol.NombreRol == "EncargadoStock":
+            return redirect("stock")  # tu url para stock
+
+        elif rol.NombreRol == "Operario":
+            return redirect("especies")  # o la vista que tú desees
+
+        # Si existe el rol pero no coincide con ninguno
+        messages.error(request, "Tu rol no tiene acceso a ninguna sección del sistema.")
+        return render(request, 'LoginTemplate/Form.html', data)
 
     return render(request, 'LoginTemplate/Form.html', data)
+
 
 @auditar("logout", "Autenticación", "Cierre de sesión")
 def RenderLogout(request):

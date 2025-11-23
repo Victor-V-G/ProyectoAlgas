@@ -6,7 +6,7 @@ from django.contrib import messages
 from .models import Contrato, EntregaContrato
 from .forms import ContratoForm, EntregaContratoForm
 from AuditoriaApp.decorators import auditar
-
+from RolApp.decorators import requiere_permiso
 from UsuariosApp.models import UsuariosModels
 
 def get_user_from_session(request):
@@ -20,11 +20,12 @@ def get_user_from_session(request):
     except UsuariosModels.DoesNotExist:
         return None
 
-
+@requiere_permiso("PermisoCrearContratos")
 def contratos_list(request):
     contratos = Contrato.objects.all().order_by("-id")
     return render(request, "contratos/lista.html", {"contratos": contratos})
 
+@requiere_permiso("PermisoCrearContratos")
 @auditar("crear", "Contrato",
          lambda req, *a, **k: f"Contrato creado para cliente {req.POST.get('cliente')}")
 def contrato_crear(request):
@@ -44,6 +45,7 @@ def contrato_crear(request):
 
     return render(request, "contratos/crear.html", {"form": form})
 
+@requiere_permiso("PermisoCrearContratos")
 @auditar("editar", "Contrato",
          lambda req, *a, **k: f"Contrato ID {k['id']} editado")
 def contrato_editar(request, id):
@@ -63,6 +65,7 @@ def contrato_editar(request, id):
 
     return render(request, "contratos/editar.html", {"form": form, "contrato": contrato})
 
+@requiere_permiso("PermisoCrearContratos")
 @auditar("eliminar", "Contrato",
          lambda req, *a, **k: f"Contrato ID {k['id']} eliminado")
 def contrato_eliminar(request, id):
@@ -71,7 +74,7 @@ def contrato_eliminar(request, id):
     messages.success(request, "Contrato eliminado.")
     return redirect("contratos")
 
-
+@requiere_permiso("PermisoCrearContratos")
 def contrato_detalle(request, id):
     contrato = get_object_or_404(Contrato, id=id)
     entregas = contrato.entregas.all().order_by("mes")
@@ -80,6 +83,7 @@ def contrato_detalle(request, id):
         "entregas": entregas
     })
 
+@requiere_permiso("PermisoCrearContratos")
 @auditar("crear", "Entrega Contrato",
          lambda req, *a, **k: f"Nueva entrega agregada al contrato {k['contrato_id']}")
 def entrega_crear(request, contrato_id):
@@ -101,7 +105,7 @@ def entrega_crear(request, contrato_id):
         "contrato": contrato
     })
 
-
+@requiere_permiso("PermisoCrearContratos")
 def entrega_editar(request, id):
     entrega = get_object_or_404(EntregaContrato, id=id)
 

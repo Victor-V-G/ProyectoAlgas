@@ -1,14 +1,13 @@
 # ProyeccionesApp/views.py
+
 from django.shortcuts import redirect
 from django.contrib import messages
-
+from RolApp.decorators import requiere_permiso
 from .services import generar_proyecciones_automaticas
 
+
+@requiere_permiso("PermisoCrearContratos")
 def actualizar_proyecciones(request):
-    """
-    Llama al microservicio, genera proyecciones y las guarda en MongoDB.
-    Luego redirige al dashboard principal.
-    """
     generar_proyecciones_automaticas()
     messages.success(request, "Proyecciones actualizadas desde el microservicio.")
     return redirect("dashboard")
