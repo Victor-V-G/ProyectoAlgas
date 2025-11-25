@@ -38,6 +38,8 @@ CSRF_TRUSTED_ORIGINS = [
     "https://proyectoalgas.fly.dev",
 ]
 
+SESSION_ENGINE = "django.contrib.sessions.backends.signed_cookies"
+
 # Application definition
 
 INSTALLED_APPS = [
