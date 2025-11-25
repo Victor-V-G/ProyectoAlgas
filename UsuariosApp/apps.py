@@ -35,7 +35,7 @@ def AutoAddDefaults(sender, **kwargs):
             "NombreRol": "Gerente",
             "DescripcionRol": "Gerente Comercial",
             "PermisoVerDashboard": True,
-            "PermisoEditarStock": False,
+            "PermisoEditarStock": True,
             "PermisoCrearContratos": True,
         },
         {
