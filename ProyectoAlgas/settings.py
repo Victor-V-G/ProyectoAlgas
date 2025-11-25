@@ -28,7 +28,11 @@ SECRET_KEY = 'django-insecure-_54^)3z(9xdx(lpf()5%iodojle1ur3xww5^7@)1d(d@qo@)%0
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
 
-ALLOWED_HOSTS = []
+ALLOWED_HOSTS = [
+    'proyectoalgas.fly.dev',
+    'localhost',
+    '127.0.0.1',
+]
 
 
 # Application definition
