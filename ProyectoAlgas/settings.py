@@ -98,24 +98,24 @@ WSGI_APPLICATION = 'ProyectoAlgas.wsgi.application'
 import pymysql
 pymysql.install_as_MySQLdb()
 
-# if os.environ.get("FLY_IO", "") == "yes":
-#     DATABASES = {
-#         "default": {
-#             "ENGINE": "django.db.backends.sqlite3",
-#             "NAME": BASE_DIR / "db.sqlite3",
-#         }
-#     }
-# else:
-#     DATABASES = {
-#         "default": {
-#             "ENGINE": "django.db.backends.mysql",
-#             "NAME": "tu_bd",
-#             "USER": "root",
-#             "PASSWORD": "root",
-#             "HOST": "mysql",
-#             "PORT": "3306",
-#         }
-#     }
+if os.environ.get("FLY_IO", "") == "yes":
+    DATABASES = {
+        "default": {
+            "ENGINE": "django.db.backends.sqlite3",
+            "NAME": BASE_DIR / "db.sqlite3",
+        }
+    }
+else:
+    DATABASES = {
+        "default": {
+            "ENGINE": "django.db.backends.mysql",
+            "NAME": "proyecto-algas-db",
+            "USER": "root",
+            "PASSWORD": "root",
+            "HOST": "mysql",
+            "PORT": "3306",
+        }
+    }
 
 
 # DATABASES = {
@@ -132,14 +132,14 @@ pymysql.install_as_MySQLdb()
 #     }
 # }
 
-DATABASES = {
-    'default': {
-        'ENGINE': 'django.db.backends.mysql',
-        'NAME': 'proyecto-algas-db',
-        'USER': 'root',
-        'PASSWORD': 'root'
-    }
-}
+# DATABASES = {
+#     'default': {
+#         'ENGINE': 'django.db.backends.mysql',
+#         'NAME': 'proyecto-algas-db',
+#         'USER': 'root',
+#         'PASSWORD': 'root'
+#     }
+# }
 
 # Password validation
 # https://docs.djangoproject.com/en/5.2/ref/settings/#auth-password-validators

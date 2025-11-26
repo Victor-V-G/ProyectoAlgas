@@ -125,18 +125,9 @@ class Contrato(models.Model):
 #   - Proyecciones comparativas
 # ===============================================================
 from EspecieApp.models import Especie
+
 class EntregaContrato(models.Model):
 
-    # -----------------------------------------------------------
-    # Relación con contrato
-    #
-    # related_name="entregas":
-    #   Permite acceso desde el contrato así:
-    #     contrato.entregas.all()
-    #
-    # on_delete=models.CASCADE:
-    #   Si se elimina el contrato, todas sus entregas también.
-    # -----------------------------------------------------------
     contrato = models.ForeignKey(
         Contrato,
         on_delete=models.CASCADE,
@@ -144,33 +135,21 @@ class EntregaContrato(models.Model):
         help_text="Contrato al cual pertenece esta entrega."
     )
 
-    # -----------------------------------------------------------
-    # Mes asociado a la entrega
-    #
-    # Se utiliza un DateField donde la fecha representa el mes,
-    # normalmente con día=1. Ejemplo: 2025-03-01 → Marzo 2025
-    # -----------------------------------------------------------
     mes = models.DateField(
         help_text="Mes correspondiente a la entrega (usar día 1)."
     )
 
-    # -----------------------------------------------------------
-    # Tonelaje planificado para ese mes
-    # -----------------------------------------------------------
     toneladas_requeridas = models.DecimalField(
         max_digits=10,
         decimal_places=2,
-        help_text="Toneladas que deben ser entregadas en el mes."
+        help_text="Kilogramos que deben ser entregados en el mes."
     )
 
-    # -----------------------------------------------------------
-    # Tonelaje realmente cumplido
-    # -----------------------------------------------------------
     toneladas_cumplidas = models.DecimalField(
         max_digits=10,
         decimal_places=2,
         default=0,
-        help_text="Toneladas efectivamente entregadas."
+        help_text="Kilogramos efectivamente entregados."
     )
 
     especie = models.ForeignKey(
@@ -180,8 +159,17 @@ class EntregaContrato(models.Model):
         help_text="Especie de alga correspondiente a esta entrega."
     )
 
-    # -----------------------------------------------------------
-    # Representación legible
-    # -----------------------------------------------------------
+    
+    compromiso_sin_stock = models.BooleanField(
+        default=False,
+        help_text="Indica si la entrega fue comprometida sin stock disponible."
+    )
+
+    fecha_limite = models.DateField(
+        null=True,
+        blank=True,
+        help_text="Fecha límite de cumplimiento cuando se compromete sin stock."
+    )
+
     def __str__(self):
-        return f"Entrega {self.mes} - {self.toneladas_requeridas}T"
+        return f"Entrega {self.mes} - {self.toneladas_requeridas} KG"

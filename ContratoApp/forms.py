@@ -49,13 +49,17 @@ class ContratoForm(forms.ModelForm):
 # ===============================================================
 # FORMULARIO: EntregaContratoForm
 # ===============================================================
+from django import forms
+from django.db.models import Sum
+from .models import Contrato, EntregaContrato
+from EspecieApp.models import Especie
+from StockApp.models import Maxisaco
+
+
 class EntregaContratoForm(forms.ModelForm):
 
     mes = forms.DateField(
-        widget=forms.DateInput(
-            attrs={"type": "date"},
-            format="%Y-%m-%d",
-        ),
+        widget=forms.DateInput(attrs={"type": "date"}, format="%Y-%m-%d"),
         input_formats=["%d-%m-%Y", "%Y-%m-%d"],
         label="Mes de Entrega",
     )
@@ -66,6 +70,17 @@ class EntregaContratoForm(forms.ModelForm):
         empty_label="Seleccione una especie",
     )
 
+    compromiso_sin_stock = forms.BooleanField(
+        required=False,
+        label="¿Se compromete la entrega pese a no haber stock?"
+    )
+
+    fecha_limite = forms.DateField(
+        widget=forms.DateInput(attrs={"type": "date"}),
+        required=False,
+        label="Fecha Límite de Cumplimiento"
+    )
+
     class Meta:
         model = EntregaContrato
         fields = [
@@ -73,6 +88,8 @@ class EntregaContratoForm(forms.ModelForm):
             "mes",
             "toneladas_requeridas",
             "toneladas_cumplidas",
+            "compromiso_sin_stock",
+            "fecha_limite",
         ]
 
         labels = {
@@ -80,23 +97,19 @@ class EntregaContratoForm(forms.ModelForm):
             "toneladas_cumplidas": "Kilogramos Entregados (KG)",
         }
 
-
+    
     def clean(self):
         cleaned_data = super().clean()
 
         especie = cleaned_data.get("especie")
         kg_requeridos = cleaned_data.get("toneladas_requeridas")
         kg_entregados = cleaned_data.get("toneladas_cumplidas")
+        compromiso = cleaned_data.get("compromiso_sin_stock")
+        fecha_limite = cleaned_data.get("fecha_limite")
 
-        # -------------------------------
-        # Validación base
-        # -------------------------------
         if not especie or kg_requeridos is None or kg_entregados is None:
             return cleaned_data
 
-        # -------------------------------
-        # Cálculo de stock real
-        # -------------------------------
         entradas = Maxisaco.objects.filter(
             especie=especie,
             tipo_movimiento="entrada",
@@ -109,31 +122,36 @@ class EntregaContratoForm(forms.ModelForm):
 
         stock_real = entradas - salidas
 
-
-        if kg_requeridos > stock_real:
+        
+        if not compromiso and kg_requeridos > stock_real:
             self.add_error(
                 "toneladas_requeridas",
-                f"No hay stock suficiente para {especie.nombre}. "
-                f"Stock disponible: {stock_real:.2f} KG."
+                f"No hay stock suficiente. Stock actual: {stock_real:.2f} KG."
             )
 
-
+        
         if kg_entregados > kg_requeridos:
             self.add_error(
                 "toneladas_cumplidas",
-                "Los kilogramos entregados no pueden ser mayores a los kilogramos requeridos."
+                "Los kilogramos entregados no pueden ser mayores a los requeridos."
+            )
+
+        
+        if compromiso and not fecha_limite:
+            self.add_error(
+                "fecha_limite",
+                "Debe asignar una fecha límite si compromete la entrega sin stock."
             )
 
         return cleaned_data
 
-
+    
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
 
-        especies_con_stock = []
+        opciones = []
 
         for especie in Especie.objects.all():
-
             entradas = Maxisaco.objects.filter(
                 especie=especie,
                 tipo_movimiento="entrada"
@@ -146,9 +164,8 @@ class EntregaContratoForm(forms.ModelForm):
 
             stock = entradas - salidas
 
-            especies_con_stock.append(
+            opciones.append(
                 (especie.id, f"{especie.nombre} | Stock: {stock:.2f} KG")
             )
 
-
-        self.fields["especie"].choices = especies_con_stock
+        self.fields["especie"].choices = opciones

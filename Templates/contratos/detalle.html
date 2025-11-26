@@ -9,14 +9,15 @@
     ➕ Agregar Entrega
 </a>
 
-<table class="table" style="margin-top: 15px;">
+<table class="table">
     <thead>
         <tr>
             <th>Especie</th>
             <th>Mes</th>
-            <th>KG Requeridos</th>
-            <th>KG Cumplidos</th>
-            <th>Acciones</th>
+            <th>KG Req.</th>
+            <th>KG Cum.</th>
+            <th>Estado</th>
+            <th>Fecha Límite</th>
         </tr>
     </thead>
     <tbody>
@@ -26,13 +27,18 @@
             <td>{{ e.mes }}</td>
             <td>{{ e.toneladas_requeridas }}</td>
             <td>{{ e.toneladas_cumplidas }}</td>
+
             <td>
-                <a href="{% url 'entrega_editar' e.id %}" class="btn btn-sm btn-warning">Editar</a>
+                {% if e.compromiso_sin_stock %}
+                    <span class="badge bg-warning text-dark">Comprometido</span>
+                {% else %}
+                    <span class="badge bg-success">Normal</span>
+                {% endif %}
             </td>
-        </tr>
-        {% empty %}
-        <tr>
-            <td colspan="5">No hay entregas registradas.</td>
+
+            <td>
+                {{ e.fecha_limite|default:"-" }}
+            </td>
         </tr>
         {% endfor %}
     </tbody>

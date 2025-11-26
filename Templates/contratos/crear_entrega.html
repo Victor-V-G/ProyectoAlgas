@@ -17,27 +17,14 @@
 <form method="POST">
     {% csrf_token %}
 
-    <div class="form-group">
-        {{ form.especie.label_tag }}<br>
-        {{ form.especie }}
-    </div>
+    {{ form.especie.label_tag }} {{ form.especie }}<br><br>
+    {{ form.mes.label_tag }} {{ form.mes }}<br><br>
+    {{ form.toneladas_requeridas.label_tag }} {{ form.toneladas_requeridas }}<br><br>
+    {{ form.toneladas_cumplidas.label_tag }} {{ form.toneladas_cumplidas }}<br><br>
 
-    <div class="form-group">
-        {{ form.mes.label_tag }}<br>
-        {{ form.mes }}
-    </div>
+    {{ form.compromiso_sin_stock }} {{ form.compromiso_sin_stock.label_tag }}<br><br>
+    {{ form.fecha_limite.label_tag }} {{ form.fecha_limite }}<br><br>
 
-    <div class="form-group">
-        {{ form.toneladas_requeridas.label_tag }}<br>
-        {{ form.toneladas_requeridas }}
-    </div>
-
-    <div class="form-group">
-        {{ form.toneladas_cumplidas.label_tag }}<br>
-        {{ form.toneladas_cumplidas }}
-    </div>
-
-    <button type="submit" class="btn btn-success">Guardar</button>
-    <a href="{% url 'contrato_detalle' contrato.id %}" class="btn btn-secondary">Cancelar</a>
+    <button type="submit">Guardar</button>
 </form>
 {% endblock %}
