@@ -124,6 +124,7 @@ class Contrato(models.Model):
 #   - Dashboard ejecutivo
 #   - Proyecciones comparativas
 # ===============================================================
+from EspecieApp.models import Especie
 class EntregaContrato(models.Model):
 
     # -----------------------------------------------------------
@@ -170,6 +171,13 @@ class EntregaContrato(models.Model):
         decimal_places=2,
         default=0,
         help_text="Toneladas efectivamente entregadas."
+    )
+
+    especie = models.ForeignKey(
+        Especie,
+        on_delete=models.PROTECT,
+        related_name="entregas",
+        help_text="Especie de alga correspondiente a esta entrega."
     )
 
     # -----------------------------------------------------------

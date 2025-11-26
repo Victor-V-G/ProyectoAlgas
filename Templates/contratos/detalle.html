@@ -2,16 +2,6 @@
 {% block title %}Detalle del Contrato{% endblock %}
 
 {% block content %}
-<h2>Contrato #{{ contrato.id }} - {{ contrato.cliente }}</h2>
-
-<hr>
-
-<p><strong>Tonelaje total:</strong> {{ contrato.tonelaje_total }} Ton</p>
-<p><strong>Fecha inicio:</strong> {{ contrato.fecha_inicio }}</p>
-<p><strong>Fecha fin:</strong> {{ contrato.fecha_fin }}</p>
-<p><strong>Estado:</strong> {{ contrato.estado }}</p>
-
-<hr>
 
 <h3>Entregas Registradas</h3>
 
@@ -22,15 +12,17 @@
 <table class="table" style="margin-top: 15px;">
     <thead>
         <tr>
+            <th>Especie</th>
             <th>Mes</th>
-            <th>KG Requeridas</th>
-            <th>KG Cumplidas</th>
+            <th>KG Requeridos</th>
+            <th>KG Cumplidos</th>
             <th>Acciones</th>
         </tr>
     </thead>
     <tbody>
         {% for e in entregas %}
         <tr>
+            <td>{{ e.especie.nombre }}</td>
             <td>{{ e.mes }}</td>
             <td>{{ e.toneladas_requeridas }}</td>
             <td>{{ e.toneladas_cumplidas }}</td>
@@ -40,7 +32,7 @@
         </tr>
         {% empty %}
         <tr>
-            <td colspan="4">No hay entregas registradas.</td>
+            <td colspan="5">No hay entregas registradas.</td>
         </tr>
         {% endfor %}
     </tbody>

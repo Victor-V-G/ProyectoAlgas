@@ -18,10 +18,10 @@
   <tr>
     <td>{{ c.id }}</td>
     <td>{{ c.cliente }}</td>
-    <td>{{ c.tonelaje_total }} T</td>
+    <td>{{ c.tonelaje_total }} kg</td>
     <td>{{ c.estado }}</td>
     <td>
-      <a href="{% url 'contrato_detalle' c.id %}">Ver</a> |
+      <a href="{% url 'contrato_detalle' c.id %}">CREAR ENTREGA</a> |
       <a href="{% url 'contrato_editar' c.id %}">Editar</a> |
       <a href="{% url 'contrato_eliminar' c.id %}">Eliminar</a>
     </td>

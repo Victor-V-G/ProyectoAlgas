@@ -65,7 +65,7 @@ TÍTULO PERSONALIZADO DE LA PÁGINA
         <!-- KPI 2: Producción Mensual -->
         <div class="kpi-card">
             <div class="kpi-title">Producción Mensual</div>
-            <div class="kpi-value">{{ produccion_mensual|floatformat:1 }} Ton</div>
+            <div class="kpi-value">{{ produccion_mensual|floatformat:1 }} KG</div>
 
             {% if produccion_var > 0 %}
                 <div class="kpi-delta positivo">↑ {{ produccion_var }}%</div>
@@ -79,7 +79,7 @@ TÍTULO PERSONALIZADO DE LA PÁGINA
         <!-- KPI 3: Inventario Total -->
         <div class="kpi-card">
             <div class="kpi-title">Inventario Total</div>
-            <div class="kpi-value">{{ inventario_total|floatformat:1 }} Ton</div>
+            <div class="kpi-value">{{ inventario_total|floatformat:1 }} KG</div>
 
             {% if inventario_var > 0 %}
                 <div class="kpi-delta positivo">↑ {{ inventario_var }}%</div>

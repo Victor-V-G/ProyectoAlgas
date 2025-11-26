@@ -1,126 +1,154 @@
 from django import forms
+from django.db.models import Sum
+
 from .models import Contrato, EntregaContrato
+from EspecieApp.models import Especie
+from StockApp.models import Maxisaco
 
 
 # ===============================================================
 # FORMULARIO: ContratoForm
-#
-# Función:
-#   Administrar la creación y edición de contratos.
-#
-# Características:
-#   - Usa ModelForm para derivar validaciones desde el modelo.
-#   - Sobrescribe fecha_inicio y fecha_fin para utilizar
-#     <input type="date"> compatible con navegadores modernos.
-#
-# input_formats:
-#   Se soportan ambos formatos:
-#     • dd-mm-YYYY  (ej: 12-02-2025)
-#     • YYYY-mm-dd  (formato estándar HTML5)
-#
-# Se utiliza en:
-#   - contrato_crear
-#   - contrato_editar
-#
-# Campos:
-#   cliente
-#   tonelaje_total
-#   fecha_inicio
-#   fecha_fin
-#   estado
 # ===============================================================
 class ContratoForm(forms.ModelForm):
 
-    # -----------------------------------------------------------
-    # Campo: fecha_inicio
-    #
-    # widget=forms.DateInput(...):
-    #     Renderiza un input tipo "date" HTML5
-    #
-    # input_formats:
-    #     Acepta dos formatos para flexibilidad al ingresar datos
-    # -----------------------------------------------------------
     fecha_inicio = forms.DateField(
         widget=forms.DateInput(
-            attrs={'type': 'date'},
-            format='%Y-%m-%d',
+            attrs={"type": "date"},
+            format="%Y-%m-%d",
         ),
-        input_formats=['%d-%m-%Y', '%Y-%m-%d'],
+        input_formats=["%d-%m-%Y", "%Y-%m-%d"],
+        label="Fecha de Inicio",
     )
 
-    # -----------------------------------------------------------
-    # Campo: fecha_fin
-    #
-    # Funciona exactamente igual que fecha_inicio,
-    # asegurando compatibilidad y consistencia.
-    # -----------------------------------------------------------
     fecha_fin = forms.DateField(
         widget=forms.DateInput(
-            attrs={'type': 'date'},
-            format='%Y-%m-%d',
+            attrs={"type": "date"},
+            format="%Y-%m-%d",
         ),
-        input_formats=['%d-%m-%Y', '%Y-%m-%d'],
+        input_formats=["%d-%m-%Y", "%Y-%m-%d"],
+        label="Fecha de Término",
     )
 
     class Meta:
         model = Contrato
-
-        # Campos habilitados para el formulario
         fields = [
-            "cliente",         # Nombre del cliente
-            "tonelaje_total",  # Toneladas totales comprometidas
-            "fecha_inicio",    # Fecha de inicio del contrato
-            "fecha_fin",       # Fecha de término
-            "estado"           # Estado del contrato (activo/completado/cancelado)
+            "cliente",
+            "tonelaje_total",
+            "fecha_inicio",
+            "fecha_fin",
+            "estado",
         ]
+
+        labels = {
+            "cliente": "Cliente",
+            "tonelaje_total": "Kilogramos Totales (KG)",
+            "estado": "Estado del Contrato",
+        }
 
 
 # ===============================================================
 # FORMULARIO: EntregaContratoForm
-#
-# Función:
-#   Administrar la creación y edición de entregas asociadas
-#   a un contrato.
-#
-# Widgets:
-#   - Se implementa un input tipo "date" para el campo mes.
-#
-# Notas:
-#   - Aunque es un DateField, el valor representa un *mes*,
-#     normalmente usando día 1 (ej: 2025-03-01 → Marzo 2025).
-#
-# Utilizado en:
-#   - entrega_crear
-#   - entrega_editar
-#
-# Campos:
-#   mes
-#   toneladas_requeridas
-#   toneladas_cumplidas
 # ===============================================================
 class EntregaContratoForm(forms.ModelForm):
 
-    # -----------------------------------------------------------
-    # Campo: mes
-    #
-    # Usado para seleccionar el mes correspondiente a la entrega.
-    #
-    # input_formats:
-    #   Soporta tanto dd-mm-YYYY como YYYY-mm-dd.
-    # -----------------------------------------------------------
     mes = forms.DateField(
         widget=forms.DateInput(
-            attrs={'type': 'date'},
-            format='%Y-%m-%d',
+            attrs={"type": "date"},
+            format="%Y-%m-%d",
         ),
-        input_formats=['%d-%m-%Y', '%Y-%m-%d'],
+        input_formats=["%d-%m-%Y", "%Y-%m-%d"],
+        label="Mes de Entrega",
+    )
+
+    especie = forms.ModelChoiceField(
+        queryset=Especie.objects.all(),
+        label="Especie de Alga",
+        empty_label="Seleccione una especie",
     )
 
     class Meta:
         model = EntregaContrato
-
         fields = [
-            "mes",                  # Mes de entrega (DateField)
-            "toneladas_requeridas", # Cantidad planificada
-            "toneladas_cumplidas",  # Cantidad efectivamente entregada
+            "especie",
+            "mes",
+            "toneladas_requeridas",
+            "toneladas_cumplidas",
         ]
+
+        labels = {
+            "toneladas_requeridas": "Kilogramos Requeridos (KG)",
+            "toneladas_cumplidas": "Kilogramos Entregados (KG)",
+        }
+
+
+    def clean(self):
+        cleaned_data = super().clean()
+
+        especie = cleaned_data.get("especie")
+        kg_requeridos = cleaned_data.get("toneladas_requeridas")
+        kg_entregados = cleaned_data.get("toneladas_cumplidas")
+
+        # -------------------------------
+        # Validación base
+        # -------------------------------
+        if not especie or kg_requeridos is None or kg_entregados is None:
+            return cleaned_data
+
+        # -------------------------------
+        # Cálculo de stock real
+        # -------------------------------
+        entradas = Maxisaco.objects.filter(
+            especie=especie,
+            tipo_movimiento="entrada",
+        ).aggregate(total=Sum("peso_kg"))["total"] or 0
+
+        salidas = Maxisaco.objects.filter(
+            especie=especie,
+            tipo_movimiento="salida",
+        ).aggregate(total=Sum("peso_kg"))["total"] or 0
+
+        stock_real = entradas - salidas
+
+
+        if kg_requeridos > stock_real:
+            self.add_error(
+                "toneladas_requeridas",
+                f"No hay stock suficiente para {especie.nombre}. "
+                f"Stock disponible: {stock_real:.2f} KG."
+            )
+
+
+        if kg_entregados > kg_requeridos:
+            self.add_error(
+                "toneladas_cumplidas",
+                "Los kilogramos entregados no pueden ser mayores a los kilogramos requeridos."
+            )
+
+        return cleaned_data
+
+
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+
+        especies_con_stock = []
+
+        for especie in Especie.objects.all():
+
+            entradas = Maxisaco.objects.filter(
+                especie=especie,
+                tipo_movimiento="entrada"
+            ).aggregate(total=Sum("peso_kg"))["total"] or 0
+
+            salidas = Maxisaco.objects.filter(
+                especie=especie,
+                tipo_movimiento="salida"
+            ).aggregate(total=Sum("peso_kg"))["total"] or 0
+
+            stock = entradas - salidas
+
+            especies_con_stock.append(
+                (especie.id, f"{especie.nombre} | Stock: {stock:.2f} KG")
+            )
+
+
+        self.fields["especie"].choices = especies_con_stock
